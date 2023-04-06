@@ -20,7 +20,20 @@ finally:
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(16)
 
-#@app.route('/')
+@app.route('/', methods=['GET'])
+def index():
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('SELECT username FROM accounts')
+    account = cursor.fetchone()
+    if account:
+        if session == None:
+            logged_in = False
+        else:
+            logged_in = True
+    return render_template('index.html')
+
+
 @app.route('/login', methods =['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -34,14 +47,16 @@ def login():
         
         if account:
             session['loggedin'] = True
-            #session['id'] = account['userID']
+            session['id'] = account['userID']
             session['username'] = account['username']
-            return render_template('index.html')
+            session['fname'] = account['first_name']
+            session['lname'] = account['last_name']
+            return render_template('index2.html')
         else:
             msg = 'Incorrect username/password!'
-            return render_template('login.html', msg=msg)
+            return render_template('login.html', the_title = 'Login', msg=msg)
     
-    return render_template('login.html')
+    return render_template('login.html', the_title = 'Login')
 
 @app.route('/logout')
 def logout():
@@ -77,7 +92,7 @@ def register():
         connection.close()
     elif request.method == 'POST':
         msg = 'Please fill out the form!'
-    return render_template('register.html', msg=msg)
+    return render_template('register.html', the_title = 'Register', msg=msg)
 
 if __name__ == '__main__':
     app.run()

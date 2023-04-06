@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>Quizzy Panda: {{ the_title }}</title>
+        <link rel="icon" type="image/png" href="#" />
+        <link rel="stylesheet" href="static/style.css" />
+    </head>
+    <body>
+        <nav>
+            <a href="/">
+                <img src="{{url_for('static', filename='images/logo.png')}}" width="5%" height="5%" style="float: left;">
+              </a>
+            <div class="navbar-left">
+                <a href="/">Home</a>
+                <a href="#contact">Contact Us</a>
+            </div>
+            <div class="navbar-right">
+                {% if logged_in == False %}
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+        <br><br><br><br><br>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

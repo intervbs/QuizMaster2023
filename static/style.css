@@ -1,52 +1,60 @@
-/* Store this code in 'style.css' file inside the 'static' folder*/
- 
-.header{
-    padding: 5px 120px;
-    width: 150px;
-    height: 70px;
-    background-color: #236B8E;
+body{
+    background-color: #222629;
+    text-align: center;
 }
 
-.border{
-    padding: 80px 50px;
-    width: 400px;
-    height: 450px;
-    border: 1px solid #236B8E;
-    border-radius: 0px;
-    background-color: #9AC0CD;
+/* The navigation bar */
+nav {
+    overflow: hidden;
+    background-color: #61892F;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    left: 0;
+    width: 100%; /* Full width */
+  }
+  
+  /* Links inside the navbar */
+  .navbar-left a {
+    left: 10px;
+    float: left;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 1.5% 2%;
+    text-decoration: none;
+  }
+  .navbar-right a {
+    left: 10px;
+    float: right;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 1.5% 2%;
+    text-decoration: none;
+  }
+  
+  /* Change background on mouse-over */
+  .navbar-right a:hover {
+    background: #86C232;
+    color: #ffffff;
+    border-radius: 10%;
+  }
+  .navbar-left a:hover {
+    background: #86C232;
+    color: #ffffff;
+    border-radius: 10%;
+  }
+
+h1{
+    color: #ffffff;
+    size: 10%
 }
 
-.btn {
-    padding: 10px 40px;
-    background-color: #236B8E;
-    color: #FFFFFF;
-    font-style: oblique;
-    font-weight: bold;
-    border-radius: 10px;
+p {
+    color: #ffffff;
 }
 
-.textbox{
-    padding: 10px 40px;
-    background-color: #236B8E;
-    text-color: #FFFFFF;
-    border-radius: 10px;
-}
-     
-::placeholder {
-    color: #FFFFFF;
-    opacity: 1;
-    font-style: oblique;
-    font-weight: bold;
-}
-
-.word{
-    color: #FFFFFF;
-    font-style: oblique;
-    font-weight: bold;
-}
-
-.bottom{
-    color: #236B8E;
-    font-style: oblique;
-    font-weight: bold;
+a {
+    font-size: 25px;
+    color: #ffffff;
 }

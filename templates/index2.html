@@ -1,0 +1,11 @@
+<!-- Store this code in 'index.html' file inside the 'templates' folder-->
+{% extends 'base.html' %}
+{% block body %}
+             <div class="header">
+                <h1 class="word">Index</h1>
+             </div></br></br></br>
+                <h1 class="bottom">
+                     Hi {{session.fname}} {{session.lname}}!!</br></br> Welcome to the index page...                
+                </h1></br></br></br>
+                <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+{% endblock %}
