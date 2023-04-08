@@ -19,8 +19,7 @@ def load_user(user_id):
 @app.route('/', methods=['GET'])
 @app.route('/index')
 def index():
-    return render_template('index.html')
-
+    return render_template('index.html', title='Welcome')
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():
@@ -34,9 +33,9 @@ def login():
                 user = User(*usr)
                 if user.check_password(password):
                     login_user(user, remember=True)
-                    return redirect(url_for('loggedin')
+                    return redirect(url_for('loggedin'))
         # If the authentication fails, return an error message to the user
-        return render_template('login.html', error='Invalid username or password')
+        return render_template('login.html')
     # If the request method is GET, simply return the login page
     return render_template('login.html', title='Login')
 

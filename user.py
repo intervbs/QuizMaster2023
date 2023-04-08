@@ -6,13 +6,14 @@ import mysql.connector
 class User():
 
     # construct / attributes
-    def __init__(self, id, username, passwordHash, firstname, lastname, rights):
+    def __init__(self, id, username, passwordHash, firstname, lastname, email, admin):
         self.id = id
         self.username = username
         self.passwordHash = passwordHash.replace("\'", "")
         self.firstname = firstname
         self.lastname = lastname
-        self.rights = rights
+        self.email = email
+        self.is_admin = admin
         self.is_authenticated = True
         self.is_active= True
         self.is_anonymous = False
