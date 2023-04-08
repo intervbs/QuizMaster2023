@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body %}
+   <div class="header">
+      <h1 class="word">Sign Up</h1>
+   </div></br></br></br>
+   <form method="POST" action="/signup">
+      <div>
+         {{ signup_form.username.label }}:   {{ signup_form.username() }}<br><br>
+         {{ signup_form.firstname.label }}:  {{ signup_form.firstname() }}<br><br>
+         {{ signup_form.lastname.label }}:   {{ signup_form.lastname() }}<br><br>
+         {{ signup_form.email.label }}:      {{ signup_form.email() }}<br><br>
+         {{ signup_form.password.label }}:   {{ signup_form.password() }}<br><br>
+         {{ signup_form.confirm.label }}:    {{ signup_form.confirm() }}<br><br>
+         <input type="submit" value="Send">
+      </div>
+   </form>
+{% endblock %}

@@ -1,4 +1,5 @@
 import secrets
+import forms
 from myDB import myDB
 from user import User
 from flask import Flask, render_template, request, escape, redirect, url_for, session
@@ -50,34 +51,19 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-'''@app.route('/register', methods=['GET', 'POST'])
-def register():
-    msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        password = request.form['password']
-        username = request.form['username']
-        connection = mysql.connector.connect(**db_config)
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
-        account = cursor.fetchone()
-        if account:
-            msg = 'Account already exists!'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', username):
-            msg = 'Invalid email address!'
-        elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Username must contain only characters and numbers!'
-        elif not username or not password:
-            msg = 'Please fill out the form!'
-        else:
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, "firstname", "lastname", "user")', (username, password))
-            connection.commit()
-            msg = 'You have successfully registered!'
-            return render_template('login.html', msg=msg)
-        cursor.close()
-        connection.close()
-    elif request.method == 'POST':
-        msg = 'Please fill out the form!'
-    return render_template('register.html', the_title = 'Register', msg=msg)'''
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    signup_form = forms.Reg_user(request.form)
+    if request.method == 'POST' and signup_form.validate():
+        username = signup_form.username.data
+        password = signup_form.password.data
+        firstname = signup_form.firstname.data
+        lastname = signup_form.lastname.data
+        email = signup_form.email.data
+        with myDB() as db:
+            db.add_new_user(username, password, firstname, lastname, email)
+            return redirect(url_for('login'))
+    return render_template('signup.html', signup_form=signup_form ,the_title = 'Sign Up')
 
 if __name__ == '__main__':
     app.run()

@@ -1,4 +1,5 @@
 import mysql.connector
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class myDB:
     def __init__(self) -> None:
@@ -45,3 +46,13 @@ class myDB:
         except mysql.connector.Error as err:
                 print(err)
         return result
+    
+    def add_new_user(self, username, password, firstname, lastname, email):
+        try: 
+            sql = 'insert into accounts (username, password, first_name, last_name, email) values (%s, %s, %s, %s, %s)'
+            values = (username, generate_password_hash(password), firstname, lastname, email)
+            self.cursor.execute(sql, values)
+        except mysql.connector.Error as err:
+             print(err)
+        return
+        
