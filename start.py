@@ -1,36 +1,24 @@
-import mysql.connector
 import secrets
-import re
+from myDB import myDB
+from user import User
 from flask import Flask, render_template, request, escape, redirect, url_for, session
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 
-
-db_config = {'host': 'localhost', 
-             'user': 'user',
-             'password': 'test',
-             'database': 'myDb'}
-try:
-    conn = mysql.connector.connect(**db_config)
-    print('Connected to MySQL database')
-except mysql.connector.Error as error:
-    print(f'Error connecting to MySQL database: {error}')
-finally:
-    conn.close()
-
 app = Flask(__name__)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 app.secret_key = secrets.token_urlsafe(16)
 
+@login_manager.user_loader
+def load_user(user_id):
+    with myDB()as db:
+        user = User(*db.get_user_by_id(user_id))
+    return user
+
 @app.route('/', methods=['GET'])
+@app.route('/index')
 def index():
-    connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT username FROM accounts')
-    account = cursor.fetchone()
-    if account:
-        if session == None:
-            logged_in = False
-        else:
-            logged_in = True
     return render_template('index.html')
 
 
@@ -40,32 +28,30 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        connection = mysql.connector.connect(**db_config)
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
-        account = cursor.fetchone()
-        
-        if account:
-            session['loggedin'] = True
-            session['id'] = account['userID']
-            session['username'] = account['username']
-            session['fname'] = account['first_name']
-            session['lname'] = account['last_name']
-            return render_template('index2.html')
-        else:
-            msg = 'Incorrect username/password!'
-            return render_template('login.html', the_title = 'Login', msg=msg)
-    
-    return render_template('login.html', the_title = 'Login')
+        with myDB() as db:
+            usr = db.get_user(username)
+            if usr:
+                user = User(*usr)
+                if user.check_password(password):
+                    login_user(user, remember=True)
+                    return redirect(url_for('loggedin')
+        # If the authentication fails, return an error message to the user
+        return render_template('login.html', error='Invalid username or password')
+    # If the request method is GET, simply return the login page
+    return render_template('login.html', title='Login')
 
-@app.route('/logout')
+@app.route('/loggedin')
+@login_required
+def loggedin():
+    return render_template('loggedin.html')
+
+@app.route('/logout', methods=["GET", "POST"])
+@login_required
 def logout():
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    session.pop('username', None)
-    return redirect(url_for('login'))
+    logout_user()
+    return redirect(url_for('index'))
 
-@app.route('/register', methods=['GET', 'POST'])
+'''@app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
@@ -92,7 +78,7 @@ def register():
         connection.close()
     elif request.method == 'POST':
         msg = 'Please fill out the form!'
-    return render_template('register.html', the_title = 'Register', msg=msg)
+    return render_template('register.html', the_title = 'Register', msg=msg)'''
 
 if __name__ == '__main__':
     app.run()
