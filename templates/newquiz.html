@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="header">
+    <h1 class="word">Make a new quiz</h1>
+    </div></br></br></br>            
+    <form method="POST" action="/newquiz">
+    <div>
+        {{ new_quiz_form.name.label }}:   {{ new_quiz_form.name() }}<br><br>
+        {{ new_quiz_form.description.label }}:  {{ new_quiz_form.description() }}<br><br>
+        {{ new_quiz_form.category.label }}:   {{ new_quiz_form.category() }}<br><br>
+        <input type="submit" value="Make new quiz">
+    </div>
+    </form>
+{% endblock %}

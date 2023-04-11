@@ -1,0 +1,45 @@
+CREATE TABLE accounts (
+  user_id INT PRIMARY KEY AUTO_INCREMENT,
+  first_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  admin BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE quiz (
+  quiz_id INT PRIMARY KEY AUTO_INCREMENT,
+  quiz_name VARCHAR(255) NOT NULL,
+  quiz_description TEXT NOT NULL,
+  user_id INT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES accounts (user_id)
+);
+
+CREATE TABLE questions (
+  question_id INT PRIMARY KEY AUTO_INCREMENT,
+  quiz_id INT NOT NULL,
+  question_text TEXT NOT NULL,
+  FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id)
+);
+
+CREATE TABLE answers (
+  answer_id INT PRIMARY KEY AUTO_INCREMENT,
+  question_id INT NOT NULL,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY (question_id) REFERENCES questions (question_id)
+);
+
+CREATE TABLE responses (
+  response_id INT PRIMARY KEY,
+  user_id INT NOT NULL,
+  quiz_id INT NOT NULL,
+  question_id INT NOT NULL,
+  answer_id INT NOT NULL,
+  points INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES accounts (user_id),
+  FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id),
+  FOREIGN KEY (question_id) REFERENCES questions (question_id),
+  FOREIGN KEY (answer_id) REFERENCES answers (answer_id)
+);

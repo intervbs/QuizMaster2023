@@ -12,7 +12,7 @@ nav {
     left: 0;
     width: 100%; /* Full width */
   }
-  
+
   /* Links inside the navbar */
   .navbar-left a {
     left: 10px;
@@ -20,7 +20,7 @@ nav {
     display: block;
     color: #ffffff;
     text-align: center;
-    padding: 1.5% 2%;
+    padding: 30px 50px;
     text-decoration: none;
   }
   .navbar-right a {
@@ -29,7 +29,7 @@ nav {
     display: block;
     color: #ffffff;
     text-align: center;
-    padding: 1.5% 2%;
+    padding: 30px 50px;
     text-decoration: none;
   }
   
@@ -37,17 +37,17 @@ nav {
   .navbar-right a:hover {
     background: #86C232;
     color: #ffffff;
-    border-radius: 10%;
+    border-radius: 10px;
   }
   .navbar-left a:hover {
     background: #86C232;
     color: #ffffff;
-    border-radius: 10%;
+    border-radius: 10px;
   }
 
 h1{
     color: #ffffff;
-    size: 10%
+    size: 16px
 }
 
 p {
@@ -57,4 +57,20 @@ p {
 a {
     font-size: 25px;
     color: #ffffff;
+}
+
+  .quizlink {
+    size: 16px;
+  }
+
+table {
+  margin: auto;
+  table-layout: fixed;
+  width: 75%;
+  
+}
+table td, table th {
+  padding: 10px;
+  word-wrap: break-word;
+  color: #ffffff;
 }
