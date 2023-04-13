@@ -129,6 +129,9 @@ class myDB:
                    answer_2, correct_answer_2, answer_3, correct_answer_3,
                    answer_4, correct_answer_4):
         try:
+            print(quiz_id, question_text, answer_1, correct_answer_1,
+                   answer_2, correct_answer_2, answer_3, correct_answer_3,
+                   answer_4, correct_answer_4)
             self.cursor.execute('''insert into questions 
                                 (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct	)
                                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',

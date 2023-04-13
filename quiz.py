@@ -20,6 +20,7 @@ class quiz_questions:
         self.is_correct2    = choice2_correct
         self.is_correct3    = choice3_correct
         self.is_correct4    = choice4_correct
+    
 
 
 

@@ -25,6 +25,7 @@ class New_quiz(FlaskForm):
     submit = SubmitField('Generate new quiz')
 
 class questions(FlaskForm):
+    quiz_id = HiddenField()
     question_text = TextAreaField('Question', validators=[DataRequired()])
     answer_1 = StringField('Answer 1', validators=[DataRequired()])
     correct_answer_1 = BooleanField([DataRequired()])
@@ -34,9 +35,7 @@ class questions(FlaskForm):
     correct_answer_3 = BooleanField([DataRequired()])
     answer_4 = StringField('Answer 4', validators=[DataRequired()])
     correct_answer_4 = BooleanField([DataRequired()])
-    #submit = SubmitField('Submit')
-    update = SubmitField('Update')
-    delete = SubmitField('Delete')
+    submit = SubmitField('Submit')
 
 class Answer(FlaskForm):
     answer = TextAreaField('Answer',[DataRequired()])

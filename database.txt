@@ -46,83 +46,64 @@ CREATE TABLE quiz_responses (
 );
 
 
-        <form method="POST" action="{{ url_for('edit_quiz') }}">
-            {{ form.csrf_token }}
-            <div class="form-group">
-                {{ form.question_text.label }}
-                {{ form.question_text(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.answer_1.label }}
-                {{ form.answer_1(class="form-control") }}
-                {{ form.correct_answer_1(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.answer_2.label }}
-                {{ form.answer_2(class="form-control") }}
-                {{ form.correct_answer_2(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.answer_3.label }}
-                {{ form.answer_3(class="form-control") }}
-                {{ form.correct_answer_3(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.answer_4.label }}
-                {{ form.answer_4(class="form-control") }}
-                {{ form.correct_answer_4(class="form-control") }}
-            </div>
-            <button type="submit" class="quizlink">Submit</button>
-        </form>
-        
-        INSERT INTO questions (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct) 
-        VALUES (3, 'Hvor ligger Tromsø', 'Viken', 'Nordland', 'Troms og Finnmark', 'Trøndelag', FALSE, FALSE, TRUE, FALSE);
+@app.route('/editquiz', methods=['GET', 'POST'])
+@admin_required
+def edit_quiz():
+    '''Function to add, edit or delete questions in the quiz'''
+    form = forms.questions()
+    if form.validate_on_submit():
+        question_text   = form.question_text.data
+        answer_1        = form.answer_1.data
+        answer_2        = form.answer_2.data
+        answer_3        = form.answer_3.data
+        answer_4        = form.answer_4.data
+        correct_answer_1 = form.correct_answer_1.data
+        correct_answer_2 = form.correct_answer_2.data
+        correct_answer_3 = form.correct_answer_3.data
+        correct_answer_4 = form.correct_answer_4.data
+        with myDB() as db:
+            print(quiz_id)
+            quiz_id = request.args.get('quiz_id')
+            print('Dette er en ID:',quiz_id)
+            db.add_question(quiz_id, question_text, answer_1, correct_answer_1, 
+                            answer_2, correct_answer_2, answer_3, correct_answer_3,
+                            answer_4, correct_answer_4)
+            flash('New question added to quiz!')
+            return redirect(url_for('loggedin'))
+    return render_template('edit_quiz.html', quiz_id=quiz_id, form=form)
+
+    with myDB() as db:
+                db.update_question(question_id, form.question_text.data, form.answer_1.data, form.correct_answer_1.data,
+                                    form.answer_2.data, form.correct_answer_2.data, form.answer_3.data, form.correct_answer_3.data,
+                                    form.answer_4.data, form.correct_answer_4.data)
 
 
-{% extends 'base.html' %}
-{% block content %}
-    <h1 class="bottom">
-      Choose a quiz to add/update questions               
-    </h1></br></br></br>
-    <form method="post" action="{{ url_for('quiz') }}">
-        {{ form_quiz.csrf_token }}
-        {{ form_quiz.quiz_name.label }} {{ form_quiz.quiz_name }} <br>
-        <input type="hidden" name="form_type" value="quiz">
-        <button type="submit">Submit</button>
-    </form>
-    <form method="post" action="{{ url_for('quiz') }}">
-        {{ form_questions.csrf_token }}
-        {{ form_questions.question.label }} {{ form_questions.question }} <br>
-        <input type="hidden" name="form_type" value="question">
-        <button type="submit">Update question</button>
     </form> 
-
-    <form method="POST" action="{{ url_for('quiz') }}">
+    <form method="POST" action="{{ url_for('edit_quiz') }}">
         {{ form.csrf_token }}
         <div class="form-group">
-            {{ form.question_text.label }}
-            {{ form.question_text(class="form-control") }}
+            {{ form.question.label }}
+            {{ form.question(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.answer_1.label }}
-            {{ form.answer_1(class="form-control") }}
-            {{ form.correct_answer_1(class="form-control") }}
+            {{ form.choice1.label }}
+            {{ form.choice1(class="form-control") }}
+            {{ form.is_correct1(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.answer_2.label }}
-            {{ form.answer_2(class="form-control") }}
-            {{ form.correct_answer_2(class="form-control") }}
+          {{ form.choice2.label }}
+          {{ form.choice2(class="form-control") }}
+          {{ form.is_correct2(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.answer_3.label }}
-            {{ form.answer_3(class="form-control") }}
-            {{ form.correct_answer_3(class="form-control") }}
+          {{ form.choice3.label }}
+          {{ form.choice3(class="form-control") }}
+          {{ form.is_correct3(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.answer_4.label }}
-            {{ form.answer_4(class="form-control") }}
-            {{ form.correct_answer_4(class="form-control") }}
+          {{ form.choice4.label }}
+          {{ form.choice4(class="form-control") }}
+          {{ form.is_correct4(class="form-control") }}
         </div>
-        <button type="submit" class="quizlink">Submit</button>
+        <button type="submit" class="quizlink">Add new question</button>
     </form>
-{% endblock %}
