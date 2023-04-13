@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% block body %}
+{% block content %}
    <h1 class="bottom">
-      Hi {{current_user.firstname}} {{current_user.lastname}}!!</br></br> Welcome to the index page...                
+      Hi {{current_user.firstname}} {{current_user.lastname}}!!</br></br>              
    </h1></br></br></br>
    <h1>Table of quizzes</h1>
       <table>
@@ -23,31 +23,23 @@
                   <td>{{ quizidx.category }}</td>
                   <td>
                      <form method="POST" action="/quiz">
-                     <input type="hidden" name="quiz_id" value="{{ quizidx.quiz_id }}">
-                     <button type="submit" class="quizlink">Take Quiz</button>
+                        <input type="hidden" name="quiz_id" value="{{ quizidx.quiz_id }}">
+                        <button type="submit" class="quizlink">Take Quiz</button>
                      </form>
                   </td>
                   {% if current_user.is_admin %}
                   <td>
-                     <button onclick="edit_quiz({{ quizidx.quiz_id }})">Add new question</button>
-                  
-                  <script>
-                     function edit_quiz(quiz_id) {
-                        window.location.href = "/editquiz?quiz_id=" + quiz_id;
-                     }
-                  </script>
-                     
-                        {% if quizidx.visible == 0 %}
-                        <form method="POST" action="/loggedin">
-                        <input type="hidden" name="visible" value="{{ 1 }}">
-                        <button type="submit" class="quizlink">Show Quiz</button>
-                        </form>
-                        {% else %}
-                        <form method="POST" action="/loggedin">
-                        <input type="hidden" name="visible" value="{{ 0 }}">
-                        <button type="submit" class="quizlink">Hide quiz</button>
-                        </form>
-                        {% endif %}
+                     {% if quizidx.visible == 0 %}
+                     <form method="POST" action="/loggedin">
+                     <input type="hidden" name="visible" value="{{ (quizidx.quiz_id, 1) }}">
+                     <button type="submit" class="quizlink">Show Quiz</button>
+                     </form>
+                     {% else %}
+                     <form method="POST" action="/loggedin">
+                     <input type="hidden" name="visible" value="{{ [quizidx.quiz_id, 0] }}">
+                     <button type="submit" class="quizlink">Hide quiz</button>
+                     </form>
+                     {% endif %}
                      </td>
                   {% endif %}
                </tr>

@@ -17,6 +17,7 @@
                 {% if current_user.is_admin %}
                 <a href="/users">See all users</a>
                 <a href="/newquiz">Make new quiz</a>
+                <a href="/quiz">Add/Update questions</a>
                 {% endif %}
             </div>
             <div class="navbar-right">
@@ -28,9 +29,9 @@
                 {% endif %}
             </div>
     </nav>
-        <body>
+        <div>
         <br><br><br><br><br>
-        {% block body %}
+        {% block content %}
         {% endblock %}
-    </body>
+        </div>
 </html>

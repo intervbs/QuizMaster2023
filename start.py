@@ -3,7 +3,7 @@ import secrets
 from myDB import myDB
 from user import User
 from functools import wraps
-from quiz import quiz_index, quiz_everything
+from quiz import quiz_index, quiz_questions
 from flask import Flask, render_template, request, redirect, url_for, session, abort, flash
 from flask_login import UserMixin, LoginManager, login_required, logout_user, current_user
 
@@ -12,6 +12,11 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = secrets.token_urlsafe(16)
+
+#Error handling
+'''@app.errorhandler(Exception)
+def page_not_found(error):
+    return redirect(url_for('index'))'''
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -36,8 +41,8 @@ def index():
 @app.route('/login', methods =['GET', 'POST'])
 def login():
     '''Login function, using forms and checking the information against the db'''
-    login_form = forms.Login_user(request.form)
-    if request.method == 'POST' and login_form.validate():
+    login_form = forms.Login_user()
+    if login_form.validate_on_submit():
         username = login_form.username.data
         password = login_form.password.data        
         if User.login(username, password):
@@ -48,14 +53,14 @@ def login():
 @app.route('/loggedin', methods=['GET', 'POST'])
 @login_required
 def loggedin():
-    '''When logged in the quizzes will be shown in a table'''
-    with myDB() as db:
-        value = request.form.get('visible')
-        if value != None:
-            db.quiz_hide_show(value)
-        result = db.quiz_index()
-    quizidx = [quiz_index(*x) for x in result]
-    return render_template('loggedin.html', quizidx=quizidx)
+        '''When logged in the quizzes will be shown in a table'''
+        with myDB() as db:
+            value = request.form.get('visible')
+            if value != None:
+                db.quiz_hide_show(value[1], value[4])
+            result = db.get_quiz_index()
+        quizidx = [quiz_index(*x) for x in result]
+        return render_template('loggedin.html', quizidx=quizidx)
 
 @app.route('/logout', methods=["GET", "POST"])
 @login_required
@@ -66,8 +71,8 @@ def logout():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     '''Sign Up function, using forms and validates them then adds a new user to the db'''
-    signup_form = forms.Reg_user(request.form)
-    if request.method == 'POST' and signup_form.validate():
+    signup_form = forms.Reg_user()
+    if signup_form.validate_on_submit():
         username    = signup_form.username.data
         password    = signup_form.password.data
         firstname   = signup_form.firstname.data
@@ -79,46 +84,94 @@ def signup():
     return render_template('signup.html', signup_form=signup_form ,the_title = 'Sign Up')
 
 @app.route('/quiz', methods = ['GET', 'POST'])
-@login_required
+#@admin_required
 def quiz():
-    quiz_id = request.form.get('quiz_id')
+    # Setup the dropdown menu for the quiz selection
     with myDB() as db:
-        result = db.quiz_q_and_a(quiz_id)
-        print(result)
-        if result is not None:
-            if len(result) > 4:
-                questions = quiz_everything()
-                questions.questions_id = result[0]
-                questions.quiz_id = result[1]
-                questions.question = result[2]
-                questions.answer_id = result[3]
-                for i in range(len(result)):
-                    questions.alt.append(result[i][4])
-            return render_template('quiz.html', questions=questions)
-        return render_template('quiz.html')
+        quiz_idx = db.get_quiz_index()
+    q_i = [quiz_index(*x) for x in quiz_idx]
+    quiz_choices = [(str(quiz.quiz_id), quiz.name) for quiz in q_i]
+    form_quiz = forms.Select_quiz()
+    form_quiz.quiz_name.choices = quiz_choices
+    form_questions = forms.Select_question()
+    form = forms.questions()
+    
+    if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
+        quiz_id = form_quiz.quiz_name.data
+        with myDB() as db:
+            question_index = db.get_questions(quiz_id)
+        q_q = [quiz_questions(*x) for x in question_index]
+        question_choices = [(str(question.question_id), question.question) for question in q_q]
+        form_questions.question.choices = question_choices
+        print('HERE!!!!!!:',form_questions.question.choices)
+
+        return render_template('quiz.html', form_quiz=form_quiz, form_questions=form_questions, form=form)
+    elif form_questions.validate_on_submit() and request.form['form_type2'] == 'update':
+        # Retrieve the selected question data from the database
+        question_id = form_questions.question.data
+        print('HERHERHERHEHREHRH: ',question_id)
+        with myDB() as db:
+            question_data = db.get_question_data(question_id)
+
+        # Populate the form with the retrieved data
+        form = forms.Update_question()
+        form.question_text.data = question_data.question_text
+        form.answer_1.data = question_data.answer_1
+        form.correct_answer_1.data = question_data.correct_answer_1
+        form.answer_2.data = question_data.answer_2
+        form.correct_answer_2.data = question_data.correct_answer_2
+        form.answer_3.data = question_data.answer_3
+        form.correct_answer_3.data = question_data.correct_answer_3
+        form.answer_4.data = question_data.answer_4
+        form.correct_answer_4.data = question_data.correct_answer_4
+
+        if form.validate_on_submit():
+            # Update the question in the database with the new data
+            with myDB() as db:
+                db.update_question(question_id, form.question_text.data, form.answer_1.data, form.correct_answer_1.data,
+                                    form.answer_2.data, form.correct_answer_2.data, form.answer_3.data, form.correct_answer_3.data,
+                                    form.answer_4.data, form.correct_answer_4.data)
+
+        return render_template('quiz.html', form_quiz=form_quiz, form_questions=form_questions, form=form)
+
+    elif request.method == 'POST':
+        # Add a new question to the database
+        if form.validate_on_submit():
+            with myDB() as db:
+                db.add_question(form_questions.quiz_name.data, form.question_text.data, form.answer_1.data,
+                                 form.correct_answer_1.data, form.answer_2.data, form.correct_answer_2.data,
+                                 form.answer_3.data, form.correct_answer_3.data, form.answer_4.data,
+                                 form.correct_answer_4.data)
+
+        return render_template('quiz.html', form_quiz=form_quiz, form_questions=form_questions, form=form)
+
+    return render_template('quiz.html', form_quiz=form_quiz, form_questions=form_questions, form=form)
+
+@app.route('/empty', methods=["GET", "POST"])
+def empty():
+    return render_template('empty.html')
 
 @app.route('/newquiz', methods=['GET', 'POST'])
 @admin_required
 def new_quiz():
-    '''Create a new quiz only if you have the admin rights the adds it to the db'''
-    new_quiz_form = forms.New_quiz(request.form)
-    if request.method == 'POST' and new_quiz_form.validate():
-        name        = new_quiz_form.name.data
-        description = new_quiz_form.description.data
-        category    = new_quiz_form.category.data
+    '''Create a new quiz only if you have the admin rights then adds it to the db'''
+    form = forms.New_quiz()
+    if form.validate_on_submit():
+        name        = form.name.data.strip()
+        description = form.description.data.strip()
+        category    = form.category.data.strip()
+        print(name, description, category)
         with myDB() as db:
-            db.new_quiz(name, description, category, current_user.id)
+            db.add_new_quiz(name, description, category)
             return redirect(url_for('loggedin'))
-    return render_template('newquiz.html', new_quiz_form=new_quiz_form, title='Make a new quiz')
+    return render_template('newquiz.html', form=form, title='Make a new quiz')
 
 @app.route('/editquiz', methods=['GET', 'POST'])
 @admin_required
 def edit_quiz():
     '''Function to add, edit or delete questions in the quiz'''
-    quiz_id = request.args.get('quiz_id')
-    print('DETTE er ARGS: ', quiz_id)
-    form = forms.questions(request.form)
-    if request.method == 'POST' and form.validate():
+    form = forms.questions()
+    if form.validate_on_submit():
         question_text   = form.question_text.data
         answer_1        = form.answer_1.data
         answer_2        = form.answer_2.data
@@ -132,7 +185,7 @@ def edit_quiz():
             print(quiz_id)
             quiz_id = request.args.get('quiz_id')
             print('Dette er en ID:',quiz_id)
-            db.quiz_add_question(quiz_id, question_text, answer_1, correct_answer_1, 
+            db.add_question(quiz_id, question_text, answer_1, correct_answer_1, 
                             answer_2, correct_answer_2, answer_3, correct_answer_3,
                             answer_4, correct_answer_4)
             flash('New question added to quiz!')

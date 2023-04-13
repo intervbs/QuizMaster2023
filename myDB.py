@@ -30,6 +30,10 @@ class myDB:
         result = self.cursor.fetchall()
         return result
     
+    #############
+    #   USERS   #
+    #############
+
     def get_user(self, username):
         try:
             self.cursor.execute('SELECT * FROM accounts WHERE username = (%s)', (username,))
@@ -55,50 +59,104 @@ class myDB:
              print(error)
         return
     
-    def new_quiz(self, name, description, category, user_id):
+    ############
+    #   QUIZ   #
+    ############
+
+    def get_quiz_index(self):
         try:
-            self.cursor.execute('insert into quiz (quiz_name, quiz_description, quiz_category, user_id) values (%s, %s, %s, %s)',
-                                (name, description, category, user_id))
-        except mysql.connector.Error as error:
-            print(error)
-        return
-    
-    def quiz_index(self):
-        try:
-            self.cursor.execute('select * from quiz')
+            self.cursor.execute('select * from quizzes')
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
         return result
     
-    def quiz_q_and_a(self, quiz_id):
+    def add_new_quiz(self, name, description, category):
         try:
-            self.cursor.execute('SELECT q.question_id, q.quiz_id, q.question_text, a.answer_id, a.answer_text FROM questions q JOIN answers a ON q.question_id = a.question_id WHERE q.quiz_id = %s', (quiz_id,))
+            self.cursor.execute('insert into quizzes (name, description, category) values (%s, %s, %s)', (name, description, category))
+        except mysql.connector.Error as error:
+            print(error)
+        return
+    
+    def quiz_hide_show(self, quiz_id, value):
+        try:
+            self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id))
+        except mysql.connector.Error as error:
+            print(error)
+        return
+
+    #################
+    #   QUESTIONS   #
+    #################
+
+    def get_questions(self, id):
+        try:
+            self.cursor.execute('SELECT * FROM questions WHERE quiz_id = %s', (id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
         return result
     
-    def quiz_add_question(self, quiz_id, question_text, 
-                          a1, correct_answer_1, 
-                          a2, correct_answer_2, 
-                          a3, correct_answer_3,
-                          a4, correct_answer_4):
+    def get_question(self, id):
         try:
-            self.cursor.execute("INSERT INTO questions (quiz_id, question_text) VALUES (%s, %s)", (quiz_id, question_text))
-            question_id = self.cursor.lastrowid
-            print(question_id)
-            self.cursor.execute("INSERT INTO answers (question_id, answer_text, is_correct) VALUES (%s, %s, %s), (%s, %s, %s), (%s, %s, %s), (%s, %s, %s)", (question_id, a1, correct_answer_1, question_id, a2, correct_answer_2, question_id, a3, correct_answer_3, question_id, a4, correct_answer_4))
+            self.cursor.execute('SELECT * FROM questions WHERE question_id = %s', (id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def get_question_not_answered(self, user_id):
+        try:
+            self.cursor.execute('''SELECT q.* FROM questions q
+                                    WHERE NOT EXISTS (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.id)
+                                    ORDER BY q.id ASC LIMIT 1''', (user_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def get_next_question_not_answered(self, user_id, question_id):
+        try:
+            self.cursor.execute('''SELECT q.* FROM questions q
+                                    WHERE NOT EXISTS (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.id)
+                                    AND q.id > %s ORDER BY q.id ASC LIMIT 1''', (user_id, question_id))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def add_question(self, quiz_id, question_text, answer_1, correct_answer_1,
+                   answer_2, correct_answer_2, answer_3, correct_answer_3,
+                   answer_4, correct_answer_4):
+        try:
+            self.cursor.execute('''insert into questions 
+                                (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct	)
+                                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+                                (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4))
         except mysql.connector.Error as error:
             print(error)
         return
 
-    def quiz_hide_show(self, value):
+    def quiz_answer(self, user_id, question_id, answer):
         try:
-            self.cursor.execute('update quiz set quiz_visible = (%s)', (value,))
+            self.cursor.execute('INSERT INTO answers (user_id, question_id, answer_text) VALUES (%s, %s, %s)', (user_id, question_id, answer))
         except mysql.connector.Error as error:
             print(error)
         return
 
+    def update_question(self, question_id, question_text, answer_1, correct_answer_1,
+                        answer_2, correct_answer_2, answer_3, correct_answer_3,
+                        answer_4, correct_answer_4):
+        try:
+            self.cursor.execute('''UPDATE questions SET question_text = %s,
+                                    choice1_text = %s, choice2_text = %s, choice3_text = %s, choice4_text = %s,
+                                    choice1_correct = %s, choice2_correct = %s, choice3_correct = %s, choice4_correct = %s
+                                    WHERE question_id = %s''',
+                                    question_text, answer_1, answer_2, answer_3, answer_4,
+                                    correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4)
+        except mysql.connector.Error as error:
+            print(error)
+        return
+    
         
         

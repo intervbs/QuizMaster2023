@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="bottom">
+      Good Luck on the quiz.               
+    </h1></br></br></br>
+    <h1>Quiz</h1>
+    <h2>{{ question.question }}</h2>
+
+    <form action="{{ url_for('quiz', spm_id=question.spm_id) }}" method="POST">
+        {{ take_quiz.csrf_token }}
+        <input type="hidden" name="user_id" value="{{ current_user.id }}">
+        <input type="hidden" name="question_id" value="{{ question.id }}">
+        <label for="answer">Answer:</label>
+        {{ form.answer(class_="form-control") }}
+        <button type="submit" class="btn btn-primary">Submit Answer</button>
+    </form>
+        </table><br><br><br>
+{% endblock %}

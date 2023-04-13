@@ -1,14 +1,78 @@
 {% extends 'base.html' %}
-{% block body %}
+{% block content %}
     <h1 class="bottom">
-      Good Luck on the quiz.               
+      Choose a quiz to add/update questions               
     </h1></br></br></br>
-    <h1>Questions</h1>
-    {% for question in questions %}
-        <p>{{ question.question }}</p>
-        {% for answer in question.alt %}
-            <input type="radio" name="{{ question.question_id }}" value="{{ answer.answer_id }}"> {{ answer.answer_text }} <br>
-        {% endfor %}
-    {% endfor %}
-        </table><br><br><br>
+    <form method="post" action="{{ url_for('quiz') }}">
+        {{ form_quiz.csrf_token }}
+        {{ form_quiz.quiz_name.label }} <br> {{ form_quiz.quiz_name }} <br>
+        <input type="hidden" name="form_type" value="quiz">
+        <button type="submit">Submit</button>
+    </form>
+    <form method="post" action="{{ url_for('quiz') }}">
+        {{ form_questions.csrf_token }}
+        {{ form_questions.question.label }} <br> {{ form_questions.question }} <br>
+        <input type="hidden" name="form_type" value="update">
+        <button type="submit">Update question</button>
+    </form> 
+
+    {% if update_question %}
+    <form method="POST" action="{{ url_for('quiz') }}">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.question_text.label }}
+            {{ form.question_text(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_1.label }}
+            {{ form.answer_1(class="form-control") }}
+            {{ form.correct_answer_1(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_2.label }}
+            {{ form.answer_2(class="form-control") }}
+            {{ form.correct_answer_2(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_3.label }}
+            {{ form.answer_3(class="form-control") }}
+            {{ form.correct_answer_3(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_4.label }}
+            {{ form.answer_4(class="form-control") }}
+            {{ form.correct_answer_4(class="form-control") }}
+        </div>
+        <button type="submit" class="quizlink">Update</button>
+    </form>
+    {% else %}
+    <form method="POST" action="{{ url_for('quiz') }}">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.question_text.label }}
+            {{ form.question_text(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_1.label }}
+            {{ form.answer_1(class="form-control") }}
+            {{ form.correct_answer_1(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_2.label }}
+            {{ form.answer_2(class="form-control") }}
+            {{ form.correct_answer_2(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_3.label }}
+            {{ form.answer_3(class="form-control") }}
+            {{ form.correct_answer_3(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_4.label }}
+            {{ form.answer_4(class="form-control") }}
+            {{ form.correct_answer_4(class="form-control") }}
+        </div>
+        <button type="submit" class="quizlink">Add new question</button>
+    </form>
+    {% endif %}
 {% endblock %}

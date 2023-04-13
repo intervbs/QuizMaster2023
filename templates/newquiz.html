@@ -1,14 +1,22 @@
 {% extends 'base.html' %}
-{% block body %}
+{% block content %}
     <div class="header">
     <h1 class="word">Make a new quiz</h1>
     </div></br></br></br>            
-    <form method="POST" action="/newquiz">
-    <div>
-        {{ new_quiz_form.name.label }}:   {{ new_quiz_form.name() }}<br><br>
-        {{ new_quiz_form.description.label }}:  {{ new_quiz_form.description() }}<br><br>
-        {{ new_quiz_form.category.label }}:   {{ new_quiz_form.category() }}<br><br>
-        <input type="submit" value="Make new quiz">
-    </div>
-    </form>
+    <form method="POST" action="{{ url_for('new_quiz') }}">
+        {{ form.csrf_token }}
+        <div class="form-group">
+           <label for="Quizname">Quiz Name</label><br>
+           {{ form.name(class="form-control", placeholder="Enter a quiz name", size=200) }}
+        </div>
+        <div class="form-group">
+           <label for="Description">Description</label>
+           {{ form.description(class="form-control", placeholder="Enter a description") }}
+        </div>
+        <div class="form-group">
+           <label for="Category">category</label>
+           {{ form.category(class="form-control", placeholder="Enter a category") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+     </form>
 {% endblock %}

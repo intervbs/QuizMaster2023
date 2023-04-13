@@ -1,45 +1,128 @@
 CREATE TABLE accounts (
-  user_id INT PRIMARY KEY AUTO_INCREMENT,
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  username VARCHAR(255) NOT NULL,
-  admin BOOLEAN NOT NULL DEFAULT FALSE
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(63) NOT NULL,
+    last_name VARCHAR(63) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    username VARCHAR(63) NOT NULL,
+    admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE quiz (
-  quiz_id INT PRIMARY KEY AUTO_INCREMENT,
-  quiz_name VARCHAR(255) NOT NULL,
-  quiz_description TEXT NOT NULL,
-  user_id INT NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES accounts (user_id)
+CREATE TABLE quizzes (
+    quiz_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL DEFAULT 'No Description Added'
+    category VARCHAR(50) NOT NULL,
+    is_public BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE questions (
-  question_id INT PRIMARY KEY AUTO_INCREMENT,
-  quiz_id INT NOT NULL,
-  question_text TEXT NOT NULL,
-  FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id)
+    question_id INT PRIMARY KEY AUTO_INCREMENT,
+    quiz_id INT NOT NULL,
+    question_text VARCHAR(255) NOT NULL,
+    choice1_text VARCHAR(255) NOT NULL,
+    choice2_text VARCHAR(255) NOT NULL,
+    choice3_text VARCHAR(255) NOT NULL,
+    choice4_text VARCHAR(255) NOT NULL,
+    choice1_correct BOOLEAN NOT NULL DEFAULT FALSE,
+    choice2_correct BOOLEAN NOT NULL DEFAULT FALSE,
+    choice3_correct BOOLEAN NOT NULL DEFAULT FALSE,
+    choice4_correct BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 
-CREATE TABLE answers (
-  answer_id INT PRIMARY KEY AUTO_INCREMENT,
-  question_id INT NOT NULL,
-  answer_text TEXT NOT NULL,
-  is_correct BOOLEAN NOT NULL DEFAULT FALSE,
-  FOREIGN KEY (question_id) REFERENCES questions (question_id)
+CREATE TABLE quiz_responses (
+    response_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    quiz_id INT NOT NULL,
+    question_id INT NOT NULL,
+    choice1_selected BOOLEAN NOT NULL DEFAULT FALSE,
+    choice2_selected BOOLEAN NOT NULL DEFAULT FALSE,
+    choice3_selected BOOLEAN NOT NULL DEFAULT FALSE,
+    choice4_selected BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES accounts(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
 );
 
-CREATE TABLE responses (
-  response_id INT PRIMARY KEY,
-  user_id INT NOT NULL,
-  quiz_id INT NOT NULL,
-  question_id INT NOT NULL,
-  answer_id INT NOT NULL,
-  points INT NOT NULL DEFAULT 0,
-  FOREIGN KEY (user_id) REFERENCES accounts (user_id),
-  FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id),
-  FOREIGN KEY (question_id) REFERENCES questions (question_id),
-  FOREIGN KEY (answer_id) REFERENCES answers (answer_id)
-);
+
+        <form method="POST" action="{{ url_for('edit_quiz') }}">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.question_text.label }}
+                {{ form.question_text(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.answer_1.label }}
+                {{ form.answer_1(class="form-control") }}
+                {{ form.correct_answer_1(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.answer_2.label }}
+                {{ form.answer_2(class="form-control") }}
+                {{ form.correct_answer_2(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.answer_3.label }}
+                {{ form.answer_3(class="form-control") }}
+                {{ form.correct_answer_3(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.answer_4.label }}
+                {{ form.answer_4(class="form-control") }}
+                {{ form.correct_answer_4(class="form-control") }}
+            </div>
+            <button type="submit" class="quizlink">Submit</button>
+        </form>
+        
+        INSERT INTO questions (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct) 
+        VALUES (3, 'Hvor ligger Tromsø', 'Viken', 'Nordland', 'Troms og Finnmark', 'Trøndelag', FALSE, FALSE, TRUE, FALSE);
+
+
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="bottom">
+      Choose a quiz to add/update questions               
+    </h1></br></br></br>
+    <form method="post" action="{{ url_for('quiz') }}">
+        {{ form_quiz.csrf_token }}
+        {{ form_quiz.quiz_name.label }} {{ form_quiz.quiz_name }} <br>
+        <input type="hidden" name="form_type" value="quiz">
+        <button type="submit">Submit</button>
+    </form>
+    <form method="post" action="{{ url_for('quiz') }}">
+        {{ form_questions.csrf_token }}
+        {{ form_questions.question.label }} {{ form_questions.question }} <br>
+        <input type="hidden" name="form_type" value="question">
+        <button type="submit">Update question</button>
+    </form> 
+
+    <form method="POST" action="{{ url_for('quiz') }}">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.question_text.label }}
+            {{ form.question_text(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_1.label }}
+            {{ form.answer_1(class="form-control") }}
+            {{ form.correct_answer_1(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_2.label }}
+            {{ form.answer_2(class="form-control") }}
+            {{ form.correct_answer_2(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_3.label }}
+            {{ form.answer_3(class="form-control") }}
+            {{ form.correct_answer_3(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.answer_4.label }}
+            {{ form.answer_4(class="form-control") }}
+            {{ form.correct_answer_4(class="form-control") }}
+        </div>
+        <button type="submit" class="quizlink">Submit</button>
+    </form>
+{% endblock %}

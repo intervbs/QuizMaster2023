@@ -1,17 +1,32 @@
 {% extends 'base.html' %}
-{% block body %}
-   <div class="header">
-      <h1 class="word">Sign Up</h1>
-   </div></br></br></br>
-   <form method="POST" action="/signup">
-      <div>
-         {{ signup_form.username.label }}:   {{ signup_form.username() }}<br><br>
-         {{ signup_form.firstname.label }}:  {{ signup_form.firstname() }}<br><br>
-         {{ signup_form.lastname.label }}:   {{ signup_form.lastname() }}<br><br>
-         {{ signup_form.email.label }}:      {{ signup_form.email() }}<br><br>
-         {{ signup_form.password.label }}:   {{ signup_form.password() }}<br><br>
-         {{ signup_form.confirm.label }}:    {{ signup_form.confirm() }}<br><br>
-         <input type="submit" value="Register">
+{% block content %}
+   <h1>Login</h1>
+   <form method="POST" action="{{ url_for('signup') }}">
+      {{ signup_form.csrf_token }}
+      <div class="form-group">
+         <label for="username">Username</label>
+         {{ signup_form.username(class="form-control", placeholder="Enter username") }}
       </div>
+      <div class="form-group">
+         <label for="firstname">firstname</label>
+         {{ signup_form.firstname(class="form-control", placeholder="Enter firstname") }}
+      </div>
+      <div class="form-group">
+         <label for="lastname">lastname</label>
+         {{ signup_form.lastname(class="form-control", placeholder="Enter lastname") }}
+      </div>
+      <div class="form-group">
+         <label for="email">email</label>
+         {{ signup_form.email(class="form-control", placeholder="Enter email") }}
+      </div>
+      <div class="form-group">
+         <label for="password">Password</label>
+         {{ signup_form.password(class="form-control", placeholder="Enter password") }}
+      </div>
+      <div class="form-group">
+         <label for="confirm">confirm</label>
+         {{ signup_form.confirm(class="form-control", placeholder="Enter confirm") }}
+      </div>
+      <button type="submit" class="btn btn-primary">Register</button>
    </form>
 {% endblock %}
