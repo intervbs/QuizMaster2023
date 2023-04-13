@@ -135,13 +135,18 @@ def edit_quiz():
         elif form.validate_on_submit():
             # Add a new question to the database
             print(form.quiz_id.data)
+            quiz_id = form.quiz_id.data
             with myDB() as db:
-                db.add_question(form.quiz_id.data, form.question_text.data, form.answer_1.data,
+                db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
                                 form.correct_answer_1.data, form.answer_2.data, form.correct_answer_2.data,
                                 form.answer_3.data, form.correct_answer_3.data, form.answer_4.data,
                                 form.correct_answer_4.data)
+            with myDB() as db:
+                question_index = db.get_questions(quiz_id)
+            q_q = [quiz_questions(*x) for x in question_index]
+            form.process()
 
-            return render_template('edit_quiz.html', form_quiz=form_quiz)
+            return render_template('edit_quiz.html', form_quiz=form_quiz, form=form, q_q=q_q, quiz_id=quiz_id)
 
     return render_template('edit_quiz.html', form_quiz=form_quiz)
 

@@ -13,7 +13,7 @@
     <h1>Questions</h1>
     <p>Click on the question to edit it.</p>
     {% for q in q_q %}
-      	<a href="?id={{ q.question_id  }}">{{ q.question  }}</a></td>
+      	<a href="?id={{ q.question_id  }}">{{ q.question  }}</a><br>
     {% endfor %}
     {% endif %}
 	{% if form %}
