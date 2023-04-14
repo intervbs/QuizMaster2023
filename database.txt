@@ -78,32 +78,68 @@ def edit_quiz():
                                     form.answer_4.data, form.correct_answer_4.data)
 
 
-    </form> 
-    <form method="POST" action="{{ url_for('edit_quiz') }}">
-        {{ form.csrf_token }}
-        <div class="form-group">
-            {{ form.question.label }}
-            {{ form.question(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.choice1.label }}
-            {{ form.choice1(class="form-control") }}
-            {{ form.is_correct1(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.choice2.label }}
-          {{ form.choice2(class="form-control") }}
-          {{ form.is_correct2(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.choice3.label }}
-          {{ form.choice3(class="form-control") }}
-          {{ form.is_correct3(class="form-control") }}
-        </div>
-        <div class="form-group">
-          {{ form.choice4.label }}
-          {{ form.choice4(class="form-control") }}
-          {{ form.is_correct4(class="form-control") }}
-        </div>
-        <button type="submit" class="quizlink">Add new question</button>
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="bottom">
+      Choose a quiz to add/update questions               
+    </h1></br></br></br>
+    <form method="post" action="{{ url_for('edit_quiz') }}">
+        {{ form_quiz.csrf_token }}
+        {{ form_quiz.quiz_name.label }} <br> {{ form_quiz.quiz_name }} <br>
+        <input type="hidden" name="form_type" value="quiz">
+        <button type="submit">Submit</button>
     </form>
+    {% if q_q %}
+    <h1>Questions</h1>
+    <p>Click on the question to edit it.</p>
+    {% for q in q_q %}
+      	<a href="?id={{ q.question_id  }}">{{ q.question  }}</a><br>
+    {% endfor %}
+    {% endif %}
+	{% if form %}
+	</form> 
+	<div class = "container">
+		<h2>Add new question</h2>
+		<form method="POST" action="{{ url_for('edit_quiz') }}">
+			{{ form.csrf_token }}
+			<div class="form-group">
+				{{ form.quiz_id(value=quiz_id, class="form-control") }}
+			</div>
+			<div class="form-group">
+				<label for="question">Question</label><br>
+				{{ form.question_text(class="form-control", placeholder="Enter a question") }}
+			</div>
+			<div class="form-group">
+				<label for="Choice A">Choice A</label>
+				{{ form.answer_1(class="form-control", placeholder="Enter a answer") }}
+				{{ form.correct_answer_1(class="form-control") }}
+			</div>
+			<div class="form-group">
+				<label for="Choice B">Choice B</label>
+				{{ form.answer_2(class="form-control", placeholder="Enter a answer") }}
+				{{ form.correct_answer_2(class="form-control") }}
+			</div>
+			<div class="form-group">
+				<label for="Choice C">Choice C</label>
+				{{ form.answer_3(class="form-control", placeholder="Enter a answer") }}
+				{{ form.correct_answer_3(class="form-control") }}
+			</div>
+			<div class="form-group">
+				<label for="Choice D">Choice D</label>
+				{{ form.answer_4(class="form-control", placeholder="Enter a answer") }}
+				{{ form.correct_answer_4(class="form-control") }}
+			</div>
+			<button type="submit" class="quizlink">Add new question</button>
+		</form>
+
+	{% endif %}
+{% endblock %}
+
+if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
+            quiz_id = form_quiz.quiz_name.data
+            with myDB() as db:
+                question_index = db.get_questions(quiz_id)
+            q_q = [quiz_questions(*x) for x in question_index]
+            print(quiz_id)
+            return render_template('edit_quiz.html', form_quiz=form_quiz, form=form, q_q=q_q, quiz_id=quiz_id)
+        

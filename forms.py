@@ -26,6 +26,7 @@ class New_quiz(FlaskForm):
 
 class questions(FlaskForm):
     quiz_id = HiddenField()
+    question_id = HiddenField()
     question_text = TextAreaField('Question', validators=[DataRequired()])
     answer_1 = StringField('Answer 1', validators=[DataRequired()])
     correct_answer_1 = BooleanField([DataRequired()])
@@ -36,6 +37,7 @@ class questions(FlaskForm):
     answer_4 = StringField('Answer 4', validators=[DataRequired()])
     correct_answer_4 = BooleanField([DataRequired()])
     submit = SubmitField('Submit')
+    update = SubmitField('Update')
 
 class Answer(FlaskForm):
     answer = TextAreaField('Answer',[DataRequired()])
@@ -66,12 +68,3 @@ class Select_question(FlaskForm):
             if question.question_id not in unique_questions:
                 self.question.choices.append((question.question_id, question.question))
                 unique_questions.add(question.question)
-'''
-class Select_quiz(FlaskForm):
-    id = HiddenField()
-    quiz_name = SelectField('Select a quiz')
-
-    def __init__(self, *quizzes, **kwargs):
-        super().__init__(**kwargs)
-        self.id.data = [quiz.quiz_id for quiz in quizzes]
-        self.quiz_name.choices = [quiz.name for quiz in quizzes]'''

@@ -123,14 +123,16 @@ def edit_quiz():
         form_quiz = forms.Select_quiz()
         form_quiz.quiz_name.choices = quiz_choices
         form = forms.questions()
+        form_question = forms.Select_question()
         
         if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
+            # Validates the information from the dropdown, then makes a list with all the questions
             quiz_id = form_quiz.quiz_name.data
             with myDB() as db:
                 question_index = db.get_questions(quiz_id)
             q_q = [quiz_questions(*x) for x in question_index]
-            print(quiz_id)
-            return render_template('edit_quiz.html', form_quiz=form_quiz, form=form, q_q=q_q, quiz_id=quiz_id)
+            
+            return render_template('edit_quiz.html', form_quiz=form_quiz, form_question=form_question, form=form, q_q=q_q, quiz_id=quiz_id)
 
         elif form.validate_on_submit():
             # Add a new question to the database
@@ -146,15 +148,50 @@ def edit_quiz():
             q_q = [quiz_questions(*x) for x in question_index]
             form.process()
 
-            return render_template('edit_quiz.html', form_quiz=form_quiz, form=form, q_q=q_q, quiz_id=quiz_id)
+            return render_template('edit_quiz.html', form_quiz=form_quiz,  form=form, q_q=q_q, quiz_id=quiz_id)
+
+    else:
+        with myDB() as db:
+            result = db.get_question(id)
+            question = quiz_questions(*result[0])
+            form_edit = forms.questions()
+            form_edit.question_id.data = question.question_id
+            form_edit.question_text.data = question.question
+            form_edit.answer_1.data = question.choice1
+            form_edit.answer_2.data = question.choice2
+            form_edit.answer_3.data = question.choice3
+            form_edit.answer_4.data = question.choice4
+            form_edit.correct_answer_1.data = question.is_correct1
+            form_edit.correct_answer_2.data = question.is_correct2
+            form_edit.correct_answer_3.data = question.is_correct3
+            form_edit.correct_answer_4.data = question.is_correct4
+            return render_template('edit_questions.html', form_edit=form_edit)
 
     return render_template('edit_quiz.html', form_quiz=form_quiz)
 
 
 @app.route('/update', methods = ['GET', 'POST'])
-@admin_required
+#@admin_required
 def update():
-    pass
+    form = forms.questions()
+    if form.validate_on_submit():
+        question_id     = int(form.question_id.data)
+        question_text   = form.question_text.data.strip()
+        answer_1        = form.answer_1.data.strip()
+        answer_2        = form.answer_2.data.strip()
+        answer_3        = form.answer_3.data.strip()
+        answer_4        = form.answer_4.data.strip()
+        correct_answer_1 = int(form.correct_answer_1.data)
+        correct_answer_2 = int(form.correct_answer_2.data)
+        correct_answer_3 = int(form.correct_answer_3.data)
+        correct_answer_4 = int(form.correct_answer_4.data)
+        values = (question_text, answer_1, answer_2, answer_3, answer_4, 
+                  correct_answer_1, correct_answer_2, correct_answer_3,  correct_answer_4, question_id)
+        with myDB() as db:
+            db.update_question(values)
+        return redirect(url_for('edit_quiz'))
+    else:
+        return render_template('edit_questions.html', form=form)
 
 if __name__ == '__main__':
     app.run()

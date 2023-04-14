@@ -129,9 +129,6 @@ class myDB:
                    answer_2, correct_answer_2, answer_3, correct_answer_3,
                    answer_4, correct_answer_4):
         try:
-            print(quiz_id, question_text, answer_1, correct_answer_1,
-                   answer_2, correct_answer_2, answer_3, correct_answer_3,
-                   answer_4, correct_answer_4)
             self.cursor.execute('''insert into questions 
                                 (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct	)
                                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
@@ -147,16 +144,21 @@ class myDB:
             print(error)
         return
 
-    def update_question(self, question_id, question_text, answer_1, correct_answer_1,
-                        answer_2, correct_answer_2, answer_3, correct_answer_3,
-                        answer_4, correct_answer_4):
+    def update_question(self, test):
         try:
-            self.cursor.execute('''UPDATE questions SET question_text = %s,
-                                    choice1_text = %s, choice2_text = %s, choice3_text = %s, choice4_text = %s,
-                                    choice1_correct = %s, choice2_correct = %s, choice3_correct = %s, choice4_correct = %s
-                                    WHERE question_id = %s''',
-                                    question_text, answer_1, answer_2, answer_3, answer_4,
-                                    correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4)
+            print(test)
+            sql = '''UPDATE questions SET 
+                        question_text = (%s), 
+                        choice1_text = (%s), 
+                        choice2_text = (%s), 
+                        choice3_text = (%s), 
+                        choice4_text = (%s), 
+                        choice1_correct = (%s), 
+                        choice2_correct = (%s), 
+                        choice3_correct = (%s), 
+                        choice4_correct = (%s) 
+                        WHERE question_id = (%s)'''
+            self.cursor.execute(sql, test)
         except mysql.connector.Error as error:
             print(error)
         return

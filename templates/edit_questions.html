@@ -1,31 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-  	<h1>Add New Question to Quiz</h1><br><br><br>
-  	<form method="POST" action="{{ url_for('edit_quiz') }}">
+  	<h1>Edit question</h1><br><br><br>
+  	<form method="POST" action="{{ url_for('update') }}">
+		{{ form_edit.csrf_token}}
     	<div class="form-group">
-      	{{ form.question_text.label }}
-      	{{ form.question_text(class="form-control") }}
+      	{{ form_edit.question_text.label }}
+      	{{ form_edit.question_text(class="form-control") }}
     	</div>
 		<div class="form-group">
-		{{ form.answer_1.label }}
-		{{ form.answer_1(class="form-control") }}
-		{{ form.correct_answer_1(class="form-control") }}
+		{{ form_edit.answer_1.label }}
+		{{ form_edit.answer_1(class="form-control") }}
+		{{ form_edit.correct_answer_1(class="form-control") }}
 		</div>
 		<div class="form-group">
-		{{ form.answer_2.label }}
-		{{ form.answer_2(class="form-control") }}
-		{{ form.correct_answer_2(class="form-control") }}
+		{{ form_edit.answer_2.label }}
+		{{ form_edit.answer_2(class="form-control") }}
+		{{ form_edit.correct_answer_2(class="form-control") }}
 		</div>
 		<div class="form-group">
-		{{ form.answer_3.label }}
-		{{ form.answer_3(class="form-control") }}
-		{{ form.correct_answer_3(class="form-control") }}
+		{{ form_edit.answer_3.label }}
+		{{ form_edit.answer_3(class="form-control") }}
+		{{ form_edit.correct_answer_3(class="form-control") }}
 		</div>
 		<div class="form-group">
-		{{ form.answer_4.label }}
-		{{ form.answer_4(class="form-control") }}
-		{{ form.correct_answer_4(class="form-control") }}
+		{{ form_edit.answer_4.label }}
+		{{ form_edit.answer_4(class="form-control") }}
+		{{ form_edit.correct_answer_4(class="form-control") }}
 		</div>
-		<button type="submit" class="quizlink">Submit</button>
+		{{ form_edit.question_id }}
+			<p>{{ form_edit.update }}</p>
 	</form>
 {% endblock %}

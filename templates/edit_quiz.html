@@ -10,10 +10,10 @@
         <button type="submit">Submit</button>
     </form>
     {% if q_q %}
-    <h1>Questions</h1>
-    <p>Click on the question to edit it.</p>
-    {% for q in q_q %}
-      	<a href="?id={{ q.question_id  }}">{{ q.question  }}</a><br>
+    	<h1>Questions</h1>
+    	<p>Click on the question to edit it.</p>
+    	{% for q in q_q %}
+      		<a href="?id={{ q.question_id  }}">{{ q.question  }}</a><br>
     {% endfor %}
     {% endif %}
 	{% if form %}
@@ -32,25 +32,24 @@
 			<div class="form-group">
 				<label for="Choice A">Choice A</label>
 				{{ form.answer_1(class="form-control", placeholder="Enter a answer") }}
-				{{ form.correct_answer_1(class="form-control") }}
+				correct answer {{ form.correct_answer_1(class="form-control") }}
 			</div>
 			<div class="form-group">
 				<label for="Choice B">Choice B</label>
 				{{ form.answer_2(class="form-control", placeholder="Enter a answer") }}
-				{{ form.correct_answer_2(class="form-control") }}
+				correct answer {{ form.correct_answer_2(class="form-control") }}
 			</div>
 			<div class="form-group">
 				<label for="Choice C">Choice C</label>
 				{{ form.answer_3(class="form-control", placeholder="Enter a answer") }}
-				{{ form.correct_answer_3(class="form-control") }}
+				correct answer {{ form.correct_answer_3(class="form-control") }}
 			</div>
 			<div class="form-group">
 				<label for="Choice D">Choice D</label>
 				{{ form.answer_4(class="form-control", placeholder="Enter a answer") }}
-				{{ form.correct_answer_4(class="form-control") }}
+				correct answer {{ form.correct_answer_4(class="form-control") }}
 			</div>
 			<button type="submit" class="quizlink">Add new question</button>
 		</form>
-
 	{% endif %}
 {% endblock %}
