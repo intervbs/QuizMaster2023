@@ -10,8 +10,8 @@
         <button type="submit">Submit</button>
     </form>
     {% if q_q %}
-    	<h1>Questions</h1>
-    	<p>Click on the question to edit or delete it.</p>
+    	<h1 class="quiz_text">Questions<br>
+    	Click on the question to edit or delete it.</h1>
     	{% for q in q_q %}
 			<div class="container">
 				<a class="button" href="?id={{ q.question_id  }}">{{ q.question  }}</a>

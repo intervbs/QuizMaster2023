@@ -1,4 +1,3 @@
-import csv
 import forms
 import secrets
 from myDB import myDB
@@ -14,10 +13,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = secrets.token_urlsafe(16)
 
-#Error handling
-'''@app.errorhandler(Exception)
+#Error handling redirecting every error to index
+@app.errorhandler(Exception)
 def page_not_found(error):
-    return redirect(url_for('login'))'''
+    return redirect(url_for('index'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -55,11 +54,12 @@ def login():
 @login_required
 def loggedin():
         '''When logged in the quizzes will be shown in a table'''
-        value = request.form.get('visible')
+        value = str(request.form.get('visible')).replace('(','').replace(')','').replace(',','')
         delete = request.form.get('delete')
+        x = value.split()
         with myDB() as db:
-            if value != None:
-                db.quiz_hide_show(value[1], value[4])        
+            if len(x) > 1:
+                db.quiz_hide_show(x[0], x[1])        
             elif delete != None:
                 db.delete_quiz(delete)
             result = db.get_quiz_index()
@@ -310,7 +310,6 @@ def update():
 def users():
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
-    print(user_id, quiz_id)
     with myDB() as db:
         result = db.get_users()
         users = [all_users(*x) for x in result]
