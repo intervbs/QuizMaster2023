@@ -42,6 +42,14 @@ class myDB:
                 print(error)
         return result
     
+    def get_users(self):
+        try:
+            self.cursor.execute('SELECT * FROM accounts')
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+                print(error)
+        return result
+    
     def get_user_by_id(self, id):
         try:
             self.cursor.execute("SELECT * FROM accounts WHERE user_id = (%s)", (id,))
@@ -62,6 +70,14 @@ class myDB:
     ############
     #   QUIZ   #
     ############
+
+    def get_quiz_num(self, id):
+        try:
+            self.cursor.execute('select * from quizzes where quiz_id = %s', (id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
 
     def get_quiz_index(self):
         try:
@@ -105,21 +121,23 @@ class myDB:
             print(error)
         return result
     
-    def get_question_not_answered(self, user_id):
+    def get_question_not_answered(self, user_id, quiz_id):
         try:
             self.cursor.execute('''SELECT q.* FROM questions q
-                                    WHERE NOT EXISTS (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.id)
-                                    ORDER BY q.id ASC LIMIT 1''', (user_id,))
+                                    WHERE NOT EXISTS 
+                                    (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.question_id) 
+                                    AND q.quiz_id = %s
+                                    ORDER BY q.question_id ASC LIMIT 1''', (user_id, quiz_id))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
         return result
     
-    def get_next_question_not_answered(self, user_id, question_id):
+    def get_next_question_not_answered(self, user_id, question_id, quiz_id):
         try:
             self.cursor.execute('''SELECT q.* FROM questions q
-                                    WHERE NOT EXISTS (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.id)
-                                    AND q.id > %s ORDER BY q.id ASC LIMIT 1''', (user_id, question_id))
+                                    WHERE NOT EXISTS (SELECT 1 FROM answers a WHERE a.user_id = %s AND a.question_id = q.question_id)
+                                    AND q.question_id > %s AND q.quiz_id = %s ORDER BY q.question_id ASC LIMIT 1''', (user_id, question_id, quiz_id))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -146,7 +164,6 @@ class myDB:
 
     def update_question(self, test):
         try:
-            print(test)
             sql = '''UPDATE questions SET 
                         question_text = (%s), 
                         choice1_text = (%s), 
@@ -163,5 +180,66 @@ class myDB:
             print(error)
         return
     
-        
-        
+    ###############
+    #   ANSWERS   #
+    ############### 
+
+    def add_answer(self, values):
+        try:
+            self.cursor.execute('''INSERT INTO answers (user_id, quiz_id, question_id, choice1_selected, choice2_selected, choice3_selected, choice4_selected)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)''', values)
+        except mysql.connector.Error as error:
+            print(error)
+
+    def get_user_answers(self, user_id, quiz_id):
+        try:
+            sql ='''SELECT q.question_text, 
+                    a.choice1_selected, 
+                    a.choice2_selected, 
+                    a.choice3_selected, 
+                    a.choice4_selected,
+                    q.choice1_correct,
+                    q.choice2_correct,
+                    q.choice3_correct,
+                    q.choice4_correct,
+                    q.choice1_text,
+                    q.choice2_text,
+                    q.choice3_text,
+                    q.choice4_text
+                    FROM answers a
+                    JOIN questions q ON a.question_id = q.question_id
+                    WHERE a.user_id = (%s) AND a.quiz_id = (%s)'''
+            self.cursor.execute(sql, (user_id, quiz_id))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def get_all_quizzes(self, user_id):
+        try:
+            self.cursor.execute('''SELECT DISTINCT q.quiz_id, q.name, q.description, q.category, q.is_public
+                                    FROM quizzes q
+                                    INNER JOIN answers a ON q.quiz_id = a.quiz_id
+                                    WHERE a.user_id = %s''', (user_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    ##############
+    #   DELETE   #
+    ##############
+
+    def delete_quiz(self, quiz_id):
+        try:
+            self.cursor.execute('DELETE FROM quizzes WHERE quiz_id = (%s)', (quiz_id,))
+            self.cursor.execute('DELETE FROM questions WHERE quiz_id = (%s)', (quiz_id,))
+            self.cursor.execute('DELETE FROM answers WHERE quiz_id = (%s)', (quiz_id,))
+        except mysql.connector.Error as error:
+            print(error)
+    
+    def delete_question(self, question_id):
+        try:
+            self.cursor.execute('DELETE FROM questions WHERE question_id = (%s)', (question_id,))
+        except mysql.connector.Error as error:
+            print(error)

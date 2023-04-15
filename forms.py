@@ -25,23 +25,37 @@ class New_quiz(FlaskForm):
     submit = SubmitField('Generate new quiz')
 
 class questions(FlaskForm):
+    user_id = HiddenField()
     quiz_id = HiddenField()
     question_id = HiddenField()
     question_text = TextAreaField('Question', validators=[DataRequired()])
     answer_1 = StringField('Answer 1', validators=[DataRequired()])
-    correct_answer_1 = BooleanField([DataRequired()])
+    correct_answer_1 = BooleanField()
     answer_2 = StringField('Answer 2', validators=[DataRequired()])
-    correct_answer_2 = BooleanField([DataRequired()])
+    correct_answer_2 = BooleanField()
     answer_3 = StringField('Answer 3', validators=[DataRequired()])
-    correct_answer_3 = BooleanField([DataRequired()])
+    correct_answer_3 = BooleanField()
     answer_4 = StringField('Answer 4', validators=[DataRequired()])
-    correct_answer_4 = BooleanField([DataRequired()])
+    correct_answer_4 = BooleanField()
     submit = SubmitField('Submit')
     update = SubmitField('Update')
 
 class Answer(FlaskForm):
-    answer = TextAreaField('Answer',[DataRequired()])
-    submit = SubmitField('Submit')
+    user_id = HiddenField()
+    question_id = HiddenField()
+    quiz_id = HiddenField()
+    question = TextAreaField('question', render_kw={'readonly': True})
+    answer1 = TextAreaField('question', render_kw={'readonly': True})
+    answer2 = TextAreaField('question', render_kw={'readonly': True})
+    answer3 = TextAreaField('question', render_kw={'readonly': True})
+    answer4 = TextAreaField('question', render_kw={'readonly': True})
+    c_answer1 = BooleanField()
+    c_answer2 = BooleanField()
+    c_answer3 = BooleanField()
+    c_answer4 = BooleanField()
+    next = SubmitField('Next')
+    save = SubmitField('Save Quiz')
+    finish = SubmitField('Finish quiz')
 
 class Select_quiz(FlaskForm):
     id = HiddenField()
@@ -68,3 +82,7 @@ class Select_question(FlaskForm):
             if question.question_id not in unique_questions:
                 self.question.choices.append((question.question_id, question.question))
                 unique_questions.add(question.question)
+
+class button(FlaskForm):
+    command = HiddenField()
+    button = SubmitField()

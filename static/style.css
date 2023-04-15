@@ -81,3 +81,33 @@ div {
 	.form_group {
     color: #ffffff;
   }
+
+  .container {
+    text-align: center;
+  }
+  .quiz_text {
+    text-decoration: none;
+    background-color: #61892F;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 1.5em;
+    padding: 8px;
+    transition: 0.35s;
+    width: 75%
+  }
+  .button {
+    size: 25px;
+    text-decoration: none;
+    background-color: #61892F;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 1.5em;
+    padding: 8px;
+    transition: 0.35s;
+    width: 75%
+  }
+  .button:hover {
+    text-decoration: none;
+    background-color: #86C232;
+    color: #ffffff;
+  }

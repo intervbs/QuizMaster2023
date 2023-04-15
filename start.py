@@ -1,10 +1,11 @@
+import csv
 import forms
 import secrets
 from myDB import myDB
 from user import User
 from functools import wraps
-from quiz import quiz_index, quiz_questions
-from flask import Flask, render_template, request, redirect, url_for, session, abort, flash
+from quiz import quiz_index, quiz_questions, all_users, all_user_answers
+from flask import Flask, render_template, request, redirect, url_for, session, make_response
 from flask_login import UserMixin, LoginManager, login_required, logout_user, current_user
 
 app = Flask(__name__)
@@ -16,7 +17,7 @@ app.secret_key = secrets.token_urlsafe(16)
 #Error handling
 '''@app.errorhandler(Exception)
 def page_not_found(error):
-    return redirect(url_for('index'))'''
+    return redirect(url_for('login'))'''
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -54,12 +55,15 @@ def login():
 @login_required
 def loggedin():
         '''When logged in the quizzes will be shown in a table'''
+        value = request.form.get('visible')
+        delete = request.form.get('delete')
         with myDB() as db:
-            value = request.form.get('visible')
             if value != None:
-                db.quiz_hide_show(value[1], value[4])
+                db.quiz_hide_show(value[1], value[4])        
+            elif delete != None:
+                db.delete_quiz(delete)
             result = db.get_quiz_index()
-        quizidx = [quiz_index(*x) for x in result]
+            quizidx = [quiz_index(*x) for x in result]
         return render_template('loggedin.html', quizidx=quizidx)
 
 @app.route('/logout', methods=["GET", "POST"])
@@ -86,12 +90,113 @@ def signup():
 @app.route('/quiz', methods = ['GET', 'POST'])
 @login_required
 def quiz():
-    pass
+    quiz_id = request.args.get('id')
+    if quiz_id != None:
+        with myDB() as db:
+            result = db.get_quiz_num(quiz_id)
+        quizidx = [quiz_index(*x) for x in result]
+        return render_template('quiz.html', quizidx=quizidx)
+    
+@app.route('/questions', methods = ['GET', 'POST'])
+@login_required
+def questions():
+    q_id = request.args.get('id')
+    form_question = forms.Answer()
+    form = forms.Answer()
 
+    if form.validate_on_submit():
+        user_id = form.user_id.data
+        quiz_id = form.quiz_id.data
+        q_id = form.question_id.data
+        a1 = form.c_answer1.data
+        a2 = form.c_answer2.data
+        a3 = form.c_answer3.data
+        a4 = form.c_answer4.data
+        
+        with myDB() as db:
+            values = (user_id, quiz_id, q_id, a1, a2, a3, a4)
+            db.add_answer(values)
+        with myDB() as db:
+            result = db.get_next_question_not_answered(user_id, q_id, quiz_id)
+            print(result)
+        if len(result) > 0:
+            question = quiz_questions(*result[0])   
+            form_question = forms.Answer()
+            form.process()
+            form = forms.Answer()
 
-@app.route('/empty', methods=["GET", "POST"])
-def empty():
-    return render_template('empty.html')
+            form.user_id.data = current_user.id
+            form.quiz_id.data = question.quiz_id
+            form.question_id.data = question.question_id
+            form_question.question.data = question.question
+            form_question.answer1.data = question.choice1
+            form_question.answer2.data = question.choice2
+            form_question.answer3.data = question.choice3
+            form_question.answer4.data = question.choice4
+            form.c_answer1.data = False
+            form.c_answer2.data = False
+            form.c_answer3.data = False
+            form.c_answer4.data = False
+            return render_template('questions.html', form_answer=form_question, form=form)
+        else:
+            return render_template('questions.html', id=current_user.id, qid=quiz_id)
+
+    elif q_id != None:
+        with myDB() as db:
+            result = db.get_question_not_answered(current_user.id, q_id)
+        if len(result) > 0:
+            question = quiz_questions(*result[0])
+            form.user_id.data = current_user.id
+            form.quiz_id.data = question.quiz_id
+            form.question_id.data = question.question_id
+            form_question.question.data = question.question
+            form_question.answer1.data = question.choice1
+            form_question.answer2.data = question.choice2
+            form_question.answer3.data = question.choice3
+            form_question.answer4.data = question.choice4
+        else:
+            return render_template('questions.html', id=current_user.id, qid=q_id)
+   
+    return render_template('questions.html', form_answer=form_question, form=form)
+
+@app.route('/save')
+@login_required
+def save():
+    user_id = request.args.get('id')
+    quiz_id = request.args.get('qid')
+    with myDB() as db:
+        answers = db.get_user_answers(int(user_id), int(quiz_id))
+    
+    output = ''
+    for row in answers:
+        question_text = row[0]
+        choice1_selected = row[1]
+        choice2_selected = row[2]
+        choice3_selected = row[3]
+        choice4_selected = row[4]
+        choice1_correct = row[5]
+        choice2_correct = row[6]
+        choice3_correct = row[7]
+        choice4_correct = row[8]
+        choice1_text    = row[9]
+        choice2_text    = row[10]
+        choice3_text    = row[11]
+        choice4_text    = row[12]
+
+        output += f"{question_text}\n"
+        output += f"{choice1_text} Your Choice: {choice1_selected} (Correct: {choice1_correct})\n"
+        output += f"{choice2_text} Your Choice: {choice2_selected} (Correct: {choice2_correct})\n"
+        output += f"{choice3_text} Your Choice: {choice3_selected} (Correct: {choice3_correct})\n"
+        output += f"{choice4_text} Your Choice: {choice4_selected} (Correct: {choice4_correct})\n\n"
+
+    # Create a response object with the output as the file contents
+    response = make_response(output)
+
+    # Set the content type and headers to indicate that this is a text file download
+    response.headers["Content-Type"] = "text/plain"
+    response.headers["Content-Disposition"] = f"attachment; filename=quiz_results.txt"
+
+    return response
 
 @app.route('/newquiz', methods=['GET', 'POST'])
 @admin_required
@@ -109,7 +214,7 @@ def new_quiz():
     return render_template('newquiz.html', form=form, title='Make a new quiz')
 
 @app.route('/editquiz', methods=['GET', 'POST'])
-#@admin_required
+@admin_required
 def edit_quiz():
     '''Function to add, edit or delete questions in the quiz'''
     id = request.args.get('id')
@@ -165,14 +270,21 @@ def edit_quiz():
             form_edit.correct_answer_2.data = question.is_correct2
             form_edit.correct_answer_3.data = question.is_correct3
             form_edit.correct_answer_4.data = question.is_correct4
+            print(form_edit.question_id.data)
             return render_template('edit_questions.html', form_edit=form_edit)
 
     return render_template('edit_quiz.html', form_quiz=form_quiz)
 
 
 @app.route('/update', methods = ['GET', 'POST'])
-#@admin_required
+@admin_required
 def update():
+    delete = request.form.get('delete')
+    if delete != None:
+        with myDB() as db:
+            print(delete)
+            db.delete_question(delete)
+            return redirect(url_for('edit_quiz'))
     form = forms.questions()
     if form.validate_on_submit():
         question_id     = int(form.question_id.data)
@@ -192,6 +304,29 @@ def update():
         return redirect(url_for('edit_quiz'))
     else:
         return render_template('edit_questions.html', form=form)
+    
+@app.route('/users', methods = ['GET', 'POST'])
+@admin_required
+def users():
+    user_id = request.args.get('id')
+    quiz_id = request.args.get('qid')
+    print(user_id, quiz_id)
+    with myDB() as db:
+        result = db.get_users()
+        users = [all_users(*x) for x in result]
+        if user_id != None and quiz_id == None:
+            result = db.get_all_quizzes(user_id)
+            q_i = [quiz_index(*x) for x in result]
+            return render_template('user.html', users=users, user_id=user_id, q_i=q_i)
+        
+        elif user_id != None and quiz_id != None:
+            with myDB() as db:
+                answers = db.get_user_answers(int(user_id), int(quiz_id))
+            output = [all_user_answers(*x) for x in answers]
+            return render_template('user.html', output=output)
+          
+        else:
+            return render_template('user.html', users=users)   
 
 if __name__ == '__main__':
     app.run()

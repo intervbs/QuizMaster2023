@@ -31,8 +31,8 @@ CREATE TABLE questions (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 
-CREATE TABLE quiz_responses (
-    response_id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE answers (
+    answer_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     quiz_id INT NOT NULL,
     question_id INT NOT NULL,
@@ -44,6 +44,8 @@ CREATE TABLE quiz_responses (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
 );
+
+
 
 
 @app.route('/editquiz', methods=['GET', 'POST'])
@@ -143,3 +145,35 @@ if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
             print(quiz_id)
             return render_template('edit_quiz.html', form_quiz=form_quiz, form=form, q_q=q_q, quiz_id=quiz_id)
         
+QUIZ.HTML
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Good Luck!</h1><br><br><br>
+    {% if form_answer %}
+        <form method="POST" action="{{ url_for('quiz') }}">
+            {{ form_answer.csrf_token}}
+            <div class="form-group">
+            {{ form_answer.question(class="form-control") }}
+            </div>
+            <div class="form-group">
+            {{ form_answer.answer1(class="form-control") }}
+            {{ form_answer.c_answer1(class="form-control") }}
+            </div>
+            <div class="form-group">
+            {{ form_answer.answer2(class="form-control") }}
+            {{ form_answer.c_answer2(class="form-control") }}
+            </div>
+            <div class="form-group">
+            {{ form_answer.answer3(class="form-control") }}
+            {{ form_answer.c_answer3(class="form-control") }}
+            </div>
+            <div class="form-group">
+            {{ form_answer.answer4(class="form-control") }}
+            {{ form_answer.c_answer4(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <p>{{ form_answer.next }}</p>
+            </div>
+        </form>
+    {% endif %}    
+{% endblock %}
