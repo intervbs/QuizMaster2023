@@ -47,14 +47,14 @@ def login():
         password = login_form.password.data        
         if User.login(username, password):
             return redirect(url_for('loggedin'))
-    # If the request method is GET, simply return the login page
     return render_template('login.html', login_form=login_form, title='Login')
 
 @app.route('/loggedin', methods=['GET', 'POST'])
 @login_required
 def loggedin():
         '''When logged in the quizzes will be shown in a table'''
-        value = str(request.form.get('visible')).replace('(','').replace(')','').replace(',','')
+        # Some string manipulation for makeing the quiz public or not
+        value = str(request.form.get('is_public')).replace('(','').replace(')','').replace(',','')
         delete = request.form.get('delete')
         x = value.split()
         with myDB() as db:
@@ -90,6 +90,7 @@ def signup():
 @app.route('/quiz', methods = ['GET', 'POST'])
 @login_required
 def quiz():
+    # Gets the id for the quiz and 
     quiz_id = request.args.get('id')
     if quiz_id != None:
         with myDB() as db:
@@ -114,17 +115,18 @@ def questions():
         a4 = form.c_answer4.data
         
         with myDB() as db:
+            # Add the answe to the db and pulls up a new question
             values = (user_id, quiz_id, q_id, a1, a2, a3, a4)
             db.add_answer(values)
-        with myDB() as db:
             result = db.get_next_question_not_answered(user_id, q_id, quiz_id)
-            print(result)
         if len(result) > 0:
+            # Makes the new question, if there is a question that is not answered
             question = quiz_questions(*result[0])   
             form_question = forms.Answer()
             form.process()
             form = forms.Answer()
 
+            # Setup all the form data
             form.user_id.data = current_user.id
             form.quiz_id.data = question.quiz_id
             form.question_id.data = question.question_id
@@ -142,6 +144,7 @@ def questions():
             return render_template('questions.html', id=current_user.id, qid=quiz_id)
 
     elif q_id != None:
+        # when entering the page it will find the first question is there is any
         with myDB() as db:
             result = db.get_question_not_answered(current_user.id, q_id)
         if len(result) > 0:
@@ -162,6 +165,8 @@ def questions():
 @app.route('/save')
 @login_required
 def save():
+    '''This function will take go throug all questions and answers and write them into a .txt file.
+    The .txt will have the question, what the user answered and the correct answers'''
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
     with myDB() as db:
@@ -256,6 +261,7 @@ def edit_quiz():
             return render_template('edit_quiz.html', form_quiz=form_quiz,  form=form, q_q=q_q, quiz_id=quiz_id)
 
     else:
+        # Form for making a new question for the given quiz
         with myDB() as db:
             result = db.get_question(id)
             question = quiz_questions(*result[0])
@@ -279,6 +285,7 @@ def edit_quiz():
 @app.route('/update', methods = ['GET', 'POST'])
 @admin_required
 def update():
+    # handels the delete request from edit question
     delete = request.form.get('delete')
     if delete != None:
         with myDB() as db:
@@ -286,7 +293,9 @@ def update():
             db.delete_question(delete)
             return redirect(url_for('edit_quiz'))
     form = forms.questions()
+
     if form.validate_on_submit():
+        # Validates the form and update the question
         question_id     = int(form.question_id.data)
         question_text   = form.question_text.data.strip()
         answer_1        = form.answer_1.data.strip()
@@ -308,22 +317,27 @@ def update():
 @app.route('/users', methods = ['GET', 'POST'])
 @admin_required
 def users():
+    '''Handels the information for the admin to check the scores of a given user for any quizzes 
+    they have taken'''
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
+
     with myDB() as db:
         result = db.get_users()
         users = [all_users(*x) for x in result]
+
         if user_id != None and quiz_id == None:
+            # Checks for all the quizzes the user have done
             result = db.get_all_quizzes(user_id)
             q_i = [quiz_index(*x) for x in result]
             return render_template('user.html', users=users, user_id=user_id, q_i=q_i)
         
         elif user_id != None and quiz_id != None:
+            # Makes a qobject with all the answers the user has given
             with myDB() as db:
                 answers = db.get_user_answers(int(user_id), int(quiz_id))
             output = [all_user_answers(*x) for x in answers]
-            return render_template('user.html', output=output)
-          
+            return render_template('user.html', output=output)          
         else:
             return render_template('user.html', users=users)   
 

@@ -1,37 +1,35 @@
-<html>
+<html lang="en">
     <head>
         <title>Quizzy Panda: {{ the_title }}</title>
         <link rel="icon" type="image/png" href="#" />
         <link rel="stylesheet" href="static/style.css" />
     </head>
     <nav>
-            <a href="/">
-                <img src="{{url_for('static', filename='images/logo.png')}}" width="85px" height="85px" style="float: left;">
-            </a>
-            <div class="navbar-left">
-                {% if current_user.is_authenticated %}
+        <a href="/">
+            <img src="{{url_for('static', filename='images/logo.png')}}" width="85px" height="85px" style="float: left;">
+        </a>
+        <div class="navbar-left">
+            {% if current_user.is_authenticated %}
                 <a href="/loggedin">Home</a>
-                {% else %}
+            {% else %}
                 <a href="/">Home</a>
-                {% endif %}
-                {% if current_user.is_admin %}
+            {% endif %}
+            {% if current_user.is_admin %}
                 <a href="/users">See all users</a>
                 <a href="/newquiz">Make new quiz</a>
                 <a href="/editquiz">Add/Update questions</a>
-                {% endif %}
-            </div>
-            <div class="navbar-right">
-                {% if current_user.is_authenticated %}
+            {% endif %}
+        </div>
+        <div class="navbar-right">
+            {% if current_user.is_authenticated %}
                 <a href="{{ url_for('logout') }}">Logout</a>
-                {% else %}
+            {% else %}
                 <a href="{{ url_for('login') }}">Login</a>
                 <a href="{{ url_for('signup') }}" > Sign Up</a>
-                {% endif %}
-            </div>
-    </nav>
-        <div>
-        <br><br><br><br><br>
-        {% block content %}
-        {% endblock %}
+            {% endif %}
         </div>
+    </nav>
+    <br><br><br><br><br>
+    {% block content %}
+    {% endblock %}
 </html>
