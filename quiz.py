@@ -23,13 +23,13 @@ class quiz_questions:
 
 class all_users():
     def __init__(self, uid, fname, lname, email, pwh, uname, admin) -> None:
-        self.user_id = uid
-        self.firstname = fname
-        self.lastname = lname
-        self.email = email
-        self.passwordHash = pwh
-        self.username = uname
-        self.admin = admin
+        self.user_id        = uid
+        self.firstname      = fname
+        self.lastname       = lname
+        self.email          = email
+        self.passwordHash   = pwh
+        self.username       = uname
+        self.admin          = admin
 
 class all_user_answers:
     def __init__(self, question_text, choice1, choice2, choice3, choice4, 

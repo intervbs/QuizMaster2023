@@ -25,12 +25,12 @@
                   {% if current_user.is_admin %}                  
                      {% if quizidx.is_public == 0 %}
                      <form method="POST" action="/loggedin">
-                     <input type="hidden" name="visible" value="{{ quizidx.quiz_id, 1 }}">
+                     <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 1 }}">
                      <a><button type="submit" class="button">Show Quiz</button></a>
                      </form>
                      {% else %}
                      <form method="POST" action="/loggedin">
-                     <input type="hidden" name="visible" value="{{ quizidx.quiz_id, 0 }}">
+                     <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 0 }}">
                      <button type="submit" class="button">Hide quiz</button>
                      </form>
                      {% endif %}
