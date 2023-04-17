@@ -3,7 +3,7 @@
         <title>Quizzy Panda: {{ the_title }}</title>
         <link rel="icon" type="image/png" href="#" />
         <link rel="stylesheet" href="static/style.css" />
-    </head>
+    </head>   
     <nav>
         <a href="/">
             <img src="{{url_for('static', filename='images/logo.png')}}" width="85px" height="85px" style="float: left;">
@@ -29,7 +29,8 @@
             {% endif %}
         </div>
     </nav>
-    <br><br><br><br><br>
-    {% block content %}
-    {% endblock %}
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
 </html>

@@ -1,5 +1,5 @@
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 class myDB:
     def __init__(self) -> None:
@@ -66,6 +66,22 @@ class myDB:
         except mysql.connector.Error as error:
              print(error)
         return
+    
+    def check_user(self, username):
+        try:
+            self.cursor.execute('select * from accounts where username = %s', (username,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def check_email(self, email):
+        try:
+            self.cursor.execute('select * from accounts where email = %s', (email,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
     
     ############
     #   QUIZ   #

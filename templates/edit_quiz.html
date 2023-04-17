@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1 class="bottom">
-      Choose a quiz to add/update questions               
-    </h1></br></br></br>
+    <h1>Choose a quiz to add/update questions</h1></br></br></br>
+	<div class="main_container">
+		<div class="quiz_container">
     <form method="post" action="{{ url_for('edit_quiz') }}">
         {{ form_quiz.csrf_token }}
         {{ form_quiz.quiz_name.label }} <br> {{ form_quiz.quiz_name }} <br>
@@ -13,15 +13,13 @@
     	<h1 class="quiz_text">Questions<br>
     	Click on the question to edit or delete it.</h1>
     	{% for q in q_q %}
-			<div class="container">
-				<a class="button" href="?id={{ q.question_id  }}">{{ q.question  }}</a>
-		  	</div>
-      		
+				<a class="form_input_button" href="?id={{ q.question_id  }}">{{ q.question  }}</a>
     {% endfor %}
     {% endif %}
+		</div>	
 	{% if form %}
 	</form> 
-	<div class = "container">
+	<div class="quiz_container">
 		<h2>Add new question</h2>
 		<form method="POST" action="{{ url_for('edit_quiz') }}">
 			{{ form.csrf_token }}
@@ -30,29 +28,15 @@
 			</div>
 			<div class="form-group">
 				<label for="question">Question</label><br>
-				{{ form.question_text(class="form-control", placeholder="Enter a question") }}
+				{{ form.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
+				{{ form.answer_1(class="form-control", placeholder="Choice A") }} Correct Answer{{ form.correct_answer_1(class="form-control") }}<br>
+				{{ form.answer_2(class="form-control", placeholder="Choice B") }} Correct Answer{{ form.correct_answer_2(class="form-control") }}
+				{{ form.answer_3(class="form-control", placeholder="Choice C") }} Correct Answer{{ form.correct_answer_3(class="form-control") }}
+				{{ form.answer_4(class="form-control", placeholder="Choice D") }} Correct Answer{{ form.correct_answer_4(class="form-control") }}
 			</div>
-			<div class="form-group">
-				<label for="Choice A">Choice A</label>
-				{{ form.answer_1(class="form-control", placeholder="Enter a answer") }}
-				correct answer {{ form.correct_answer_1(class="form-control") }}
-			</div>
-			<div class="form-group">
-				<label for="Choice B">Choice B</label>
-				{{ form.answer_2(class="form-control", placeholder="Enter a answer") }}
-				correct answer {{ form.correct_answer_2(class="form-control") }}
-			</div>
-			<div class="form-group">
-				<label for="Choice C">Choice C</label>
-				{{ form.answer_3(class="form-control", placeholder="Enter a answer") }}
-				correct answer {{ form.correct_answer_3(class="form-control") }}
-			</div>
-			<div class="form-group">
-				<label for="Choice D">Choice D</label>
-				{{ form.answer_4(class="form-control", placeholder="Enter a answer") }}
-				correct answer {{ form.correct_answer_4(class="form-control") }}
-			</div>
-			<button type="submit" class="quizlink">Add new question</button>
+			<button type="submit" class="form_input_button">Add new question</button>
 		</form>
 	{% endif %}
+	</div>
+	</div>
 {% endblock %}
