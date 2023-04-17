@@ -1,22 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
+
     <div class="header">
-    <h1 class="word">Make a new quiz</h1>
+    <h1>Make a new quiz</h1>
     </div></br></br></br>            
     <form method="POST" action="{{ url_for('new_quiz') }}">
         {{ form.csrf_token }}
-        <div class="form-group">
-           <label for="Quizname">Quiz Name</label><br>
-           {{ form.name(class="form-control", placeholder="Enter a quiz name", size=200) }}
+        <div class="form-group"><br>
+            {{ form.name(class="form-control", placeholder="Enter a quiz name") }}<br><br>
+            {{ form.description(class="form-control", placeholder="Enter a description") }}<br><br>
+            {{ form.category(class="form-control", placeholder="Enter a category") }}<br><br>
         </div>
-        <div class="form-group">
-           <label for="Description">Description</label>
-           {{ form.description(class="form-control", placeholder="Enter a description") }}
-        </div>
-        <div class="form-group">
-           <label for="Category">category</label>
-           {{ form.category(class="form-control", placeholder="Enter a category") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-     </form>
+        <button type="submit" class="form_input_button">Register</button><br>
+    </form>
 {% endblock %}

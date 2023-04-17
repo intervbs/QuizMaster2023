@@ -1,5 +1,5 @@
 import mysql.connector
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 class myDB:
     def __init__(self) -> None:
@@ -65,7 +65,22 @@ class myDB:
             self.cursor.execute(sql, values)
         except mysql.connector.Error as error:
              print(error)
-        return
+    
+    def check_user(self, username):
+        try:
+            self.cursor.execute('select * from accounts where username = %s', (username,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
+    def check_email(self, email):
+        try:
+            self.cursor.execute('select * from accounts where email = %s', (email,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
     
     ############
     #   QUIZ   #
@@ -92,14 +107,12 @@ class myDB:
             self.cursor.execute('insert into quizzes (name, description, category) values (%s, %s, %s)', (name, description, category))
         except mysql.connector.Error as error:
             print(error)
-        return
     
     def quiz_hide_show(self, quiz_id, value):
         try:
             self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id))
         except mysql.connector.Error as error:
             print(error)
-        return
 
     #################
     #   QUESTIONS   #
@@ -153,14 +166,12 @@ class myDB:
                                 (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4))
         except mysql.connector.Error as error:
             print(error)
-        return
 
     def quiz_answer(self, user_id, question_id, answer):
         try:
             self.cursor.execute('INSERT INTO answers (user_id, question_id, answer_text) VALUES (%s, %s, %s)', (user_id, question_id, answer))
         except mysql.connector.Error as error:
             print(error)
-        return
 
     def update_question(self, test):
         try:
@@ -178,7 +189,6 @@ class myDB:
             self.cursor.execute(sql, test)
         except mysql.connector.Error as error:
             print(error)
-        return
     
     ###############
     #   ANSWERS   #

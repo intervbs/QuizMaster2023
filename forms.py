@@ -14,7 +14,7 @@ class Reg_user(FlaskForm):
     firstname = StringField('First Name', [validators.Length(min = 1, max = 63)], render_kw={'placeholder': 'Enter your First Name'})
     lastname = StringField('Last Name', [validators.Length(min = 2, max = 63)], render_kw={'placeholder': 'Enter your Last Name'})
     email = EmailField('Email', validators=[validators.Length(min = 3, max = 255), Email(message='Please input a valid email')], render_kw={'placeholder': 'Enter your Email'})
-    password = PasswordField('Password', [validators.Length(min = 3, max = 255), EqualTo('confirm')], render_kw={'placeholder': 'Enter your password'})
+    password = PasswordField('Password', [validators.Length(min = 3, max = 255)], render_kw={'placeholder': 'Enter your password'})
     confirm = PasswordField('Repete Password', render_kw={'placeholder': 'Confirm your password'})
 
 class New_quiz(FlaskForm):

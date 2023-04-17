@@ -1,32 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1 class="bottom">
-      Users              
-    </h1></br></br></br>
-    {% if output %}
-    {% for i in output %}
-      <a>{{ i.question }}</a></br><br>
-      <a>{{ i.choice1_text  }}</a> Your choice: <a>{{ i.choice1  }}</a> Correct Answer: <a>{{ i.is_correct1   }}</a></br>
-      <a>{{ i.choice2_text  }}</a> Your choice: <a>{{ i.choice2  }}</a> Correct Answer: <a>{{ i.is_correct2   }}</a></br>
-      <a>{{ i.choice3_text  }}</a> Your choice: <a>{{ i.choice3  }}</a> Correct Answer: <a>{{ i.is_correct3   }}</a></br>
-      <a>{{ i.choice4_text  }}</a> Your choice: <a>{{ i.choice4  }}</a> Correct Answer: <a>{{ i.is_correct4   }}</a></br><br><br>      
-    {% endfor %}
-    {% endif %}
+	<div class="main_container">
+	<div class="quiz_container">
+	<h2>
+		Users              
+	</h2></br></br></br>
+	{% if output %}
+		{% for i in output %}
+			<a>{{ i.question }}</a></br>
+			<a>{{ i.choice1_text  }}: || Your choice: {{ i.choice1  }} || (Correct: {{ i.is_correct1 }})</a>
+			<a>{{ i.choice2_text  }}: || Your choice: {{ i.choice2  }} || (Correct: {{ i.is_correct2 }})</a>
+			<a>{{ i.choice3_text  }}: || Your choice: {{ i.choice3  }} || (Correct: {{ i.is_correct3 }})</a>
+			<a>{{ i.choice4_text  }}: || Your choice: {{ i.choice4  }} || (Correct: {{ i.is_correct4 }})</a></br><br><br>      
+		{% endfor %}
+	{% endif %}
 
-    {% if q_i %}
-    {% for q_i in q_i %}
-      <div class="container">
-        <a class="button" href="/users?id={{ user_id }}&qid={{ q_i.quiz_id }}">{{ q_i.name }}</a>
-      </div>
-    {% endfor %}
-    {% endif %}
+	{% if q_i %}
+		{% for q_i in q_i %}
+			<div class="container">
+				<a class="form_input_button" href="/users?id={{ user_id }}&qid={{ q_i.quiz_id }}">{{ q_i.name }}</a>
+			</div>
+		{% endfor %}
+	{% endif %}
 
-      {% if not q_i %}
-      {% for all_users in users %}
-        <div class="container">
-          <a class="button" href="/users?id={{ all_users.user_id }}">{{ all_users.firstname }} {{ all_users.lastname }}</a>
-        </div>
-      {% endfor %}
-      {% endif %}
-    
+	{% if not q_i %}
+		{% for all_users in users %}
+			<div class="container">
+				<a class="form_input_button" href="/users?id={{ all_users.user_id }}">{{ all_users.firstname }} {{ all_users.lastname }}</a>
+			</div><br><br>
+		{% endfor %}
+	{% endif %}	
+		</div>
+	</div>
 {% endblock %}

@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Good Luck!</h1><br><br><br>
+<h1>Good Luck!</h1><br><br><br>
+<div class="main_container">
+    <div class="quiz_container">
     {% for quizidx in quizidx %}
-        <h1>{{ quizidx.name }}</h1><br>
+        <h2>{{ quizidx.name }}</h2>
         <p>Description</p><br>
-            {{ quizidx.description }}<br>
-            <p>Category</p><br>
-            {{ quizidx.category }}<br>
-            <div class="container">
-              <a class="button" href="/questions?id={{ quizidx.quiz_id }}">Start Quiz</a>
-            </div>   
-    {% endfor %}
+        {{ quizidx.description }}<br>
+        <p>Category</p><br>
+        {{ quizidx.category }}<br><br><br>
+        <div class="container">
+          	<a class="form_input_button" href="/questions?id={{ quizidx.quiz_id }}">Start Quiz</a>
+        </div><br>     	
+	</div>
+	{% endfor %}
+</div> 
 {% endblock %}

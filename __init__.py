@@ -4,7 +4,7 @@ from myDB import myDB
 from user import User
 from functools import wraps
 from quiz import quiz_index, quiz_questions, all_users, all_user_answers
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 from flask_login import LoginManager, login_required, logout_user, current_user
 
 app = Flask(__name__)
@@ -82,7 +82,19 @@ def signup():
         firstname   = signup_form.firstname.data
         lastname    = signup_form.lastname.data
         email       = signup_form.email.data
+        confirm     = signup_form.confirm.data
+        if password != confirm:
+            flash('Passwords do not match')
+            return redirect(url_for('signup'))
         with myDB() as db:
+            user = db.check_user(username)
+            mail = db.check_email(email)
+            if user:
+                flash('Username already taken')
+                return redirect(url_for('signup'))
+            elif mail:
+                flash('Email already taken')
+                return redirect(url_for('signup'))
             db.add_new_user(username, password, firstname, lastname, email)
             return redirect(url_for('login'))
     return render_template('signup.html', signup_form=signup_form ,the_title = 'Sign Up')
@@ -276,7 +288,6 @@ def edit_quiz():
             form_edit.correct_answer_2.data = question.is_correct2
             form_edit.correct_answer_3.data = question.is_correct3
             form_edit.correct_answer_4.data = question.is_correct4
-            print(form_edit.question_id.data)
             return render_template('edit_questions.html', form_edit=form_edit)
 
     return render_template('edit_quiz.html', form_quiz=form_quiz)
@@ -289,7 +300,6 @@ def update():
     delete = request.form.get('delete')
     if delete != None:
         with myDB() as db:
-            print(delete)
             db.delete_question(delete)
             return redirect(url_for('edit_quiz'))
     form = forms.questions()
@@ -336,6 +346,7 @@ def users():
             # Makes a qobject with all the answers the user has given
             with myDB() as db:
                 answers = db.get_user_answers(int(user_id), int(quiz_id))
+
             output = [all_user_answers(*x) for x in answers]
             return render_template('user.html', output=output)          
         else:

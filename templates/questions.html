@@ -1,42 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
 {% if form %}
+<div class="main_container">
+    <div class="quiz_container">
     <form method="POST" action="{{ url_for('questions') }}">
     {{ form_answer.csrf_token}}
     {{ form.quiz_id }}
     {{ form.user_id }}
     {{ form.question_id }}
     <div class="form-group">
-    {{ form_answer.question(class="form-control") }}
+    <a>{{ form_answer.question(class="form-control") }}</a><br><br>
     </div>
     <div class="form-group">
     {{ form_answer.answer1(class="form-control") }}
-    {{ form.c_answer1(class="form-control") }}
+    {{ form.c_answer1(class="form-control") }}<br>
     </div>
     <div class="form-group">
     {{ form_answer.answer2(class="form-control") }}
-    {{ form.c_answer2(class="form-control") }}
+    {{ form.c_answer2(class="form-control") }}<br>
     </div>
     <div class="form-group">
     {{ form_answer.answer3(class="form-control") }}
-    {{ form.c_answer3(class="form-control") }}
+    {{ form.c_answer3(class="form-control") }}<br>
     </div>
     <div class="form-group">
     {{ form_answer.answer4(class="form-control") }}
     {{ form.c_answer4(class="form-control") }}
     </div>
     <div class="form-group">
-        <p>{{ form.next }}</p>
+    {{ form.next(class="form_input_button") }}
     </div>
-</form>
+    </form>
+    </div>
+</div>
 {% else %}
 <h1>Congrats you are done!</h1>
 Do you want to save the quiz or just exit?<br>
-    <div class="container">
-        <a class="button" href="/save?id={{ id }}&qid={{ qid }}">Save quiz to disk</a>
-    </div>
-    <div class="container">
-        <a class="button" href="/loggedin">Exit Quiz</a>
+    <div class="main_container">
+        <div class="quiz_container">
+            <a class="form_input_button" href="/save?id={{ id }}&qid={{ qid }}">Save quiz to disk</a>
+            <a class="form_input_button" href="/loggedin">Exit Quiz</a>
+        </div>
     </div>
 {% endif %}
 {% endblock %}
