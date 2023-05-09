@@ -1,35 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 	<div class="main_container">
-	<div class="quiz_container">
-	<h2>
-		Users              
-	</h2></br></br></br>
-	{% if output %}
-		{% for i in output %}
-			<a>{{ i.question }}</a></br>
-			<a>{{ i.choice1_text  }}: || Your choice: {{ i.choice1  }} || (Correct: {{ i.is_correct1 }})</a>
-			<a>{{ i.choice2_text  }}: || Your choice: {{ i.choice2  }} || (Correct: {{ i.is_correct2 }})</a>
-			<a>{{ i.choice3_text  }}: || Your choice: {{ i.choice3  }} || (Correct: {{ i.is_correct3 }})</a>
-			<a>{{ i.choice4_text  }}: || Your choice: {{ i.choice4  }} || (Correct: {{ i.is_correct4 }})</a></br><br><br>      
-		{% endfor %}
-	{% endif %}
-
-	{% if q_i %}
-		{% for q_i in q_i %}
-			<div class="container">
-				<a class="form_input_button" href="/users?id={{ user_id }}&qid={{ q_i.quiz_id }}">{{ q_i.name }}</a>
-			</div>
-		{% endfor %}
-	{% endif %}
-
-	{% if not q_i %}
-		{% for all_users in users %}
-			<div class="container">
-				<a class="form_input_button" href="/users?id={{ all_users.user_id }}">{{ all_users.firstname }} {{ all_users.lastname }}</a>
-			</div><br><br>
-		{% endfor %}
-	{% endif %}	
+		<div class="quiz_container">
+			<h2>Grade quizzes</h2>
+			<form method="POST" action="{{ url_for('users') }}">
+				{{ form_quiz.csrf_token }}
+				{{ form_quiz.quiz_name(class="form-control") }}<br>
+				<input type="hidden" name="form_type" value="quiz">
+				<button class="form_input_button" type="submit">Select Quiz</button>
+			</form><br>
+			{% if form_users %}
+				<form method="POST" onsubmit="this.action='grade?id=' + this.elements['user'].value;">
+					{{ form_users.csrf_token }}
+					{{ form_users.user(class="form-control") }}<br>
+					<input type="hidden" name="form_type" value="id">
+					<button class="form_input_button" type="submit">Select Question to Update/Delete</button>
+				</form>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}

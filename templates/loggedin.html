@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1 class="bottom">
+    <h1>
     {% if current_user.is_admin %}
         Hi<br><br> {{current_user.firstname}} {{current_user.lastname}}
     {% else %}
@@ -12,27 +12,29 @@
     {% for quizidx in quizidx %}
         {% if current_user.is_admin or quizidx.is_public %}
             <div class="quiz_container">
-            <a>{{ quizidx.name }}</a><br>
-            <div class="quiz_buttons">
-            <a class="form_input_button_loggedin" href="/quiz?id={{ quizidx.quiz_id }}">Take Quiz</a>
-            {% if current_user.is_admin %} 
-                {% if quizidx.is_public == 0 %}
-                    <form method="POST" action="/loggedin">
-                    <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 1 }}">
-                    <button type="submit" class="form_input_button_loggedin">Make quiz public</button>
-                    </form>
-                {% else %}
-                    <form method="POST" action="/loggedin">
-                    <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 0 }}">
-                    <button type="submit" class="form_input_button_loggedin">Hide quiz</button>
-                    </form>
-                {% endif %}
-                <form method="POST" action="/loggedin">
-                    <input type="hidden" name="delete" value="{{ quizidx.quiz_id }}">
-                    <button type="submit" class="form_input_button_loggedin" onclick="return confirm('Are you sure you want to delete this quiz?\nThis will delete all the questions and answers related to it.')">Delete Quiz</button>
+                <form class="form_choice" method="get" action="/quiz">
+                    <input type="hidden" name="id" value="{{ quizidx.quiz_id }}">
+                    <button class="form_input_button" type="submit">{{ quizidx.name }}</button>
                 </form>
+            {% if current_user.is_admin %} 
+                <div class="form_choice">
+                    {% if quizidx.is_public == 0 %}
+                        <form method="POST" action="/loggedin">
+                        <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 1 }}">
+                        <button class="form_input_button" type="submit" class="form_input_button">Make quiz public</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="/loggedin">
+                        <input type="hidden" name="is_public" value="{{ quizidx.quiz_id, 0 }}">
+                        <button class="form_input_button" type="submit" class="form_input_button">Hide quiz</button>
+                        </form>
+                    {% endif %}
+                    <form method="POST" action="/loggedin">
+                        <input type="hidden" name="delete" value="{{ quizidx.quiz_id }}">
+                        <button class="form_input_button" type="submit" class="form_input_button" onclick="return confirm('Are you sure you want to delete this quiz?\nThis will delete all the questions and answers related to it.')">Delete Quiz</button>
+                    </form>
+                </div>
             {% endif %}
-            </div>
         </div>
         {% endif %}
     {% endfor %}

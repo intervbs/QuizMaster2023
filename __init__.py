@@ -3,7 +3,7 @@ import secrets
 from myDB import myDB
 from user import User
 from functools import wraps
-from quiz import quiz_index, quiz_questions, all_users, all_user_answers
+from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question
 from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 from flask_login import LoginManager, login_required, logout_user, current_user
 
@@ -14,9 +14,9 @@ login_manager.init_app(app)
 app.secret_key = secrets.token_urlsafe(16)
 
 #Error handling redirecting every error to index
-@app.errorhandler(Exception)
+'''@app.errorhandler(Exception)
 def page_not_found(error):
-    return redirect(url_for('index'))
+    return redirect(url_for('index'))'''
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -53,7 +53,7 @@ def login():
 @login_required
 def loggedin():
         '''When logged in the quizzes will be shown in a table'''
-        # Some string manipulation for makeing the quiz public or not
+        # Some string manipulation for making the quiz public or not
         value = str(request.form.get('is_public')).replace('(','').replace(')','').replace(',','')
         delete = request.form.get('delete')
         x = value.split()
@@ -125,18 +125,20 @@ def questions():
         a2 = form.c_answer2.data
         a3 = form.c_answer3.data
         a4 = form.c_answer4.data
+        essay = form.essay_answer.data
         
         with myDB() as db:
             # Add the answe to the db and pulls up a new question
-            values = (user_id, quiz_id, q_id, a1, a2, a3, a4)
+            values = (user_id, quiz_id, q_id, a1, a2, a3, a4, essay)
             db.add_answer(values)
             result = db.get_next_question_not_answered(user_id, q_id, quiz_id)
         if len(result) > 0:
             # Makes the new question, if there is a question that is not answered
             question = quiz_questions(*result[0])   
             form_question = forms.Answer()
-            form.process()
             form = forms.Answer()
+            form_question.process()
+            form.process()
 
             # Setup all the form data
             form.user_id.data = current_user.id
@@ -147,16 +149,17 @@ def questions():
             form_question.answer2.data = question.choice2
             form_question.answer3.data = question.choice3
             form_question.answer4.data = question.choice4
+            form_question.q_type.data = question.q_type
             form.c_answer1.data = False
             form.c_answer2.data = False
             form.c_answer3.data = False
             form.c_answer4.data = False
-            return render_template('questions.html', form_answer=form_question, form=form)
+            return render_template('questions.html', form_question=form_question, form=form)
         else:
             return render_template('questions.html', id=current_user.id, qid=quiz_id)
 
     elif q_id != None:
-        # when entering the page it will find the first question is there is any
+        # when entering the page it will find the first question if there is any
         with myDB() as db:
             result = db.get_question_not_answered(current_user.id, q_id)
         if len(result) > 0:
@@ -169,10 +172,11 @@ def questions():
             form_question.answer2.data = question.choice2
             form_question.answer3.data = question.choice3
             form_question.answer4.data = question.choice4
+            form_question.q_type = question.q_type
         else:
             return render_template('questions.html', id=current_user.id, qid=q_id)
    
-    return render_template('questions.html', form_answer=form_question, form=form)
+    return render_template('questions.html', form_question=form_question, form=form)
 
 @app.route('/save')
 @login_required
@@ -201,10 +205,10 @@ def save():
         choice4_text    = row[12]
 
         output += f"{question_text}\n"
-        output += f"{choice1_text} Your Choice: {choice1_selected} (Correct: {choice1_correct})\n"
-        output += f"{choice2_text} Your Choice: {choice2_selected} (Correct: {choice2_correct})\n"
-        output += f"{choice3_text} Your Choice: {choice3_selected} (Correct: {choice3_correct})\n"
-        output += f"{choice4_text} Your Choice: {choice4_selected} (Correct: {choice4_correct})\n\n"
+        output += f"{choice1_text} || Your Choice: {choice1_selected} || (Correct: {choice1_correct})\n"
+        output += f"{choice2_text} || Your Choice: {choice2_selected} || (Correct: {choice2_correct})\n"
+        output += f"{choice3_text} || Your Choice: {choice3_selected} || (Correct: {choice3_correct})\n"
+        output += f"{choice4_text} || Your Choice: {choice4_selected} || (Correct: {choice4_correct})\n\n"
 
     # Create a response object with the output as the file contents
     response = make_response(output)
@@ -231,7 +235,7 @@ def new_quiz():
     return render_template('newquiz.html', form=form, title='Make a new quiz')
 
 @app.route('/editquiz', methods=['GET', 'POST'])
-@admin_required
+#@admin_required
 def edit_quiz():
     '''Function to add, edit or delete questions in the quiz'''
     id = request.args.get('id')
@@ -245,6 +249,8 @@ def edit_quiz():
         form_quiz = forms.Select_quiz()
         form_quiz.quiz_name.choices = quiz_choices
         form = forms.questions()
+        form_essay = forms.questions()
+        form_radio = forms.questions()
         form_question = forms.Select_question()
         
         if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
@@ -253,24 +259,64 @@ def edit_quiz():
             with myDB() as db:
                 question_index = db.get_questions(quiz_id)
             q_q = [quiz_questions(*x) for x in question_index]
+            qc = [(str(q_c.question_id), q_c.question) for q_c in q_q]
+            form_question.question.choices = qc
             
-            return render_template('edit_quiz.html', form_quiz=form_quiz, form_question=form_question, form=form, q_q=q_q, quiz_id=quiz_id)
+            return render_template('edit_quiz.html', form_quiz=form_quiz, form_question=form_question, form=form, form_essay=form_essay, q_q=q_q, quiz_id=quiz_id, form_radio=form_radio)
 
-        elif form.validate_on_submit():
+        elif form.validate_on_submit() and request.form['form_type'] == 'mc':
             # Add a new question to the database
-            print(form.quiz_id.data)
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
                                 form.correct_answer_1.data, form.answer_2.data, form.correct_answer_2.data,
                                 form.answer_3.data, form.correct_answer_3.data, form.answer_4.data,
-                                form.correct_answer_4.data)
+                                form.correct_answer_4.data, 0)
+                    
             with myDB() as db:
                 question_index = db.get_questions(quiz_id)
             q_q = [quiz_questions(*x) for x in question_index]
             form.process()
+            form_essay.process()
+            form_radio.process()
 
-            return render_template('edit_quiz.html', form_quiz=form_quiz,  form=form, q_q=q_q, quiz_id=quiz_id)
+            return render_template('edit_quiz.html', form_quiz=form_quiz)
+        
+        elif form_essay.validate_on_submit() and request.form['form_type'] == 'essay':
+            # Add a new question to the database
+            quiz_id = form.quiz_id.data
+            with myDB() as db:
+                db.add_question(quiz_id, form.question_text.data, form_essay.answer_1.data,
+                                form_essay.correct_answer_1.data, form_essay.answer_2.data, form_essay.correct_answer_2.data,
+                                form_essay.answer_3.data, form_essay.correct_answer_3.data, form_essay.answer_4.data,
+                                form_essay.correct_answer_4.data, 1)
+                    
+            with myDB() as db:
+                question_index = db.get_questions(quiz_id)
+            q_q = [quiz_questions(*x) for x in question_index]
+            form.process()
+            form_essay.process()
+            form_radio.process()
+
+            return render_template('edit_quiz.html', form_quiz=form_quiz)
+        
+        elif form_radio.validate_on_submit() and request.form['form_type'] == 'single':
+            # Add a new question to the database
+            quiz_id = form.quiz_id.data
+            with myDB() as db:
+                db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
+                                form.correct_answer_1.data, form.answer_2.data, form.correct_answer_2.data,
+                                form.answer_3.data, form.correct_answer_3.data, form.answer_4.data,
+                                form.correct_answer_4.data, 2)
+                    
+            with myDB() as db:
+                question_index = db.get_questions(quiz_id)
+            q_q = [quiz_questions(*x) for x in question_index]
+            form.process()
+            form_essay.process()
+            form_radio.process()
+
+            return render_template('edit_quiz.html', form_quiz=form_quiz)
 
     else:
         # Form for making a new question for the given quiz
@@ -284,6 +330,7 @@ def edit_quiz():
             form_edit.answer_2.data = question.choice2
             form_edit.answer_3.data = question.choice3
             form_edit.answer_4.data = question.choice4
+            form_edit.q_type = question.q_type
             form_edit.correct_answer_1.data = question.is_correct1
             form_edit.correct_answer_2.data = question.is_correct2
             form_edit.correct_answer_3.data = question.is_correct3
@@ -329,28 +376,102 @@ def update():
 def users():
     '''Handels the information for the admin to check the scores of a given user for any quizzes 
     they have taken'''
-    user_id = request.args.get('id')
-    quiz_id = request.args.get('qid')
-
+    # Setup the dropdown menu for the quiz selection
     with myDB() as db:
+        quiz_idx = db.get_quiz_index()
+    q_i = [quiz_index(*x) for x in quiz_idx]
+    quiz_choices = [(str(quiz.quiz_id), quiz.name) for quiz in q_i]    
+    form_quiz = forms.Select_quiz()
+    form_quiz.quiz_name.choices = quiz_choices
+    form_users = forms.Select_user()
+
+    if form_quiz.validate_on_submit() and request.form['form_type'] == 'quiz':
+        # Validates the information from the dropdown, then makes a list with all the users who have done the quiz
+        quiz_id = form_quiz.quiz_name.data
+        with myDB() as db:
+            user_index = db.get_users_finished_quiz(quiz_id)
+        all_user_index = [all_users(*x) for x in user_index]
+        ui = [(str((u_i.user_id, int(quiz_id))), f'{u_i.firstname} {u_i.lastname}') for u_i in all_user_index]
+        form_users.user.choices = ui
+        
+        return render_template('user.html', form_quiz=form_quiz, form_users=form_users, quiz_id=quiz_id)
+
+    return render_template('user.html', form_quiz=form_quiz)
+
+@app.route('/grade', methods = ['POST', 'GET'])
+@admin_required
+def grade():
+    '''Grading the quiz'''
+    id = str(request.args.get('id')).replace('(','').replace(')','').replace(',','')
+    x = id.split()
+    form_question = forms.Select_question()
+    form_answer = forms.Answer_grade()
+
+    if id != 'None':
+        with myDB() as db:
+            user = db.get_user_by_id(x[0])
+            quiz = db.get_quiz_num(x[1])
+            question_index = db.get_questions(x[1])
+        q_q = [quiz_questions(*x) for x in question_index]
+        qc = [(str(q_c.question_id), q_c.question) for q_c in q_q]
+        form_question.question.choices = qc
+
+    if request.method == 'POST' and request.form['form_type'] == 'question':
+        qid = form_question.question.data
+        with myDB() as db:
+            result = db.get_user_answers(x[0], int(qid))
+        if result != None:
+            question = answered_question(*result[0])
+
+        form_answer.user_id.data = x[0]
+        form_answer.question_id.data = qid
+        form_answer.aid.data = question.aid
+        form_answer.q_type.data = question.q_type
+        form_answer.q_txt.data = question.q_txt
+        form_answer.choice_text1.data = question.c1_txt
+        form_answer.choice_text2.data = question.c2_txt
+        form_answer.choice_text3.data = question.c3_txt
+        form_answer.choice_text4.data = question.c4_txt
+        form_answer.essay_answer.data = question.a_essay
+        form_answer.answer1.data = question.c1_cor
+        form_answer.answer2.data = question.c2_cor
+        form_answer.answer3.data = question.c3_cor
+        form_answer.answer4.data = question.c4_cor
+        form_answer.u_answer1.data = question.a1_sel
+        form_answer.u_answer2.data = question.a2_sel
+        form_answer.u_answer3.data = question.a3_sel
+        form_answer.u_answer4.data = question.a4_sel
+        if question.comment != None:
+            form_answer.comment.data = question.comment
+
+        return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
+
+    elif form_answer.validate_on_submit() and request.form['form_type'] == 'answer':
+        aid = int(form_answer.aid.data)
+        comment = form_answer.comment.data
+        with myDB() as db:
+            db.update_comment(aid, comment)
+            print('UPDATED')
+            return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
+
+
+    return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
+
+    
+@app.route('/adminpanel', methods = ['POST', 'GET'])
+@admin_required
+def admin_panel():
+    '''Where an admin can give another user admin rights'''
+    value = str(request.form.get('is_admin')).replace('(','').replace(')','').replace(',','')
+    x = value.split()
+
+    with myDB() as db:         
+        if len(x) > 1:
+            db.add_admin(x[0], x[1])
         result = db.get_users()
         users = [all_users(*x) for x in result]
 
-        if user_id != None and quiz_id == None:
-            # Checks for all the quizzes the user have done
-            result = db.get_all_quizzes(user_id)
-            q_i = [quiz_index(*x) for x in result]
-            return render_template('user.html', users=users, user_id=user_id, q_i=q_i)
-        
-        elif user_id != None and quiz_id != None:
-            # Makes a qobject with all the answers the user has given
-            with myDB() as db:
-                answers = db.get_user_answers(int(user_id), int(quiz_id))
-
-            output = [all_user_answers(*x) for x in answers]
-            return render_template('user.html', output=output)          
-        else:
-            return render_template('user.html', users=users)   
+    return render_template('adminpanel.html', users=users) 
 
 if __name__ == '__main__':
     app.run()

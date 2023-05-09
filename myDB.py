@@ -15,7 +15,7 @@ class myDB:
         finally:
             conn.close()
 
-    def __enter__(self) -> 'cursor':
+    def __enter__(self):
         self.conn = mysql.connector.connect(**self.configuration)
         self.cursor = self.conn.cursor(prepared=True)
         return self
@@ -50,6 +50,17 @@ class myDB:
                 print(error)
         return result
     
+    def get_users_finished_quiz(self, quiz_id):
+        try:
+            self.cursor.execute('''SELECT DISTINCT accounts.*
+                                    FROM accounts
+                                    INNER JOIN answers ON accounts.user_id = answers.user_id
+                                    WHERE answers.quiz_id = %s''', (quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
     def get_user_by_id(self, id):
         try:
             self.cursor.execute("SELECT * FROM accounts WHERE user_id = (%s)", (id,))
@@ -65,6 +76,13 @@ class myDB:
             self.cursor.execute(sql, values)
         except mysql.connector.Error as error:
              print(error)
+    
+    def add_admin(self, userid, is_admin):
+        try:
+            self.cursor.execute('update accounts set admin = %s where user_id = %s', (is_admin, userid,))
+        except mysql.connector.Error as error:
+            print(error)
+        
     
     def check_user(self, username):
         try:
@@ -158,12 +176,13 @@ class myDB:
     
     def add_question(self, quiz_id, question_text, answer_1, correct_answer_1,
                    answer_2, correct_answer_2, answer_3, correct_answer_3,
-                   answer_4, correct_answer_4):
+                   answer_4, correct_answer_4, q_type):
         try:
             self.cursor.execute('''insert into questions 
-                                (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, choice1_correct, choice2_correct, choice3_correct, choice4_correct	)
-                                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
-                                (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4))
+                                (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, 
+                                choice1_correct, choice2_correct, choice3_correct, choice4_correct, q_type	)
+                                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+                                (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4, q_type))
         except mysql.connector.Error as error:
             print(error)
 
@@ -196,18 +215,22 @@ class myDB:
 
     def add_answer(self, values):
         try:
-            self.cursor.execute('''INSERT INTO answers (user_id, quiz_id, question_id, choice1_selected, choice2_selected, choice3_selected, choice4_selected)
-                                VALUES (%s, %s, %s, %s, %s, %s, %s)''', values)
+            self.cursor.execute('''INSERT INTO answers (user_id, quiz_id, question_id, choice1_selected, choice2_selected, choice3_selected, choice4_selected, essay_answer)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', values)
         except mysql.connector.Error as error:
             print(error)
 
-    def get_user_answers(self, user_id, quiz_id):
+    def get_user_answers(self, user_id, question_id):
         try:
-            sql ='''SELECT q.question_text, 
+            sql ='''SELECT q.question_text,
+                    q.q_type,
+                    a.answer_id, 
                     a.choice1_selected, 
                     a.choice2_selected, 
                     a.choice3_selected, 
                     a.choice4_selected,
+                    a.essay_answer,
+                    a.comment,
                     q.choice1_correct,
                     q.choice2_correct,
                     q.choice3_correct,
@@ -218,8 +241,8 @@ class myDB:
                     q.choice4_text
                     FROM answers a
                     JOIN questions q ON a.question_id = q.question_id
-                    WHERE a.user_id = (%s) AND a.quiz_id = (%s)'''
-            self.cursor.execute(sql, (user_id, quiz_id))
+                    WHERE a.user_id = (%s) AND q.question_id = (%s)'''
+            self.cursor.execute(sql, (user_id, question_id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -236,6 +259,18 @@ class myDB:
             print(error)
         return result
     
+    ###############
+    #   COMMENT   #
+    ###############
+
+    def update_comment(self, aid, comment):
+        print(type(aid), aid, type(comment), comment)
+        try:
+            self.cursor.execute('UPDATE answers SET comment = %s WHERE answer_id = %s', (comment, aid,))
+        except mysql.connector.Error as error:
+            print(error)
+
+
     ##############
     #   DELETE   #
     ##############

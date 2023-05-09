@@ -1,42 +1,99 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Choose a quiz to add/update questions</h1></br></br></br>
+    <h1>Choose a quiz to add/update or delete questions</h1></br></br></br>
 	<div class="main_container">
 		<div class="quiz_container">
-    <form method="post" action="{{ url_for('edit_quiz') }}">
-        {{ form_quiz.csrf_token }}
-        {{ form_quiz.quiz_name.label }} <br> {{ form_quiz.quiz_name }} <br>
-        <input type="hidden" name="form_type" value="quiz">
-        <button type="submit">Submit</button>
-    </form>
-    {% if q_q %}
-    	<h1 class="quiz_text">Questions<br>
-    	Click on the question to edit or delete it.</h1>
-    	{% for q in q_q %}
-				<a class="form_input_button" href="?id={{ q.question_id  }}">{{ q.question  }}</a>
-    {% endfor %}
-    {% endif %}
+			<form method="post" action="{{ url_for('edit_quiz') }}">
+				{{ form_quiz.csrf_token }}
+				{{ form_quiz.quiz_name(class="form-control") }}<br>
+				<input type="hidden" name="form_type" value="quiz">
+				<button class="form_input_button" type="submit">Select Quiz</button>
+			</form><br>
+			{% if form_question %}
+				<form method="POST" onsubmit="this.action='?id=' + this.elements['question'].value;">
+					{{ form_question.csrf_token }}
+					{{ form_question.question(class="form-control") }}<br>
+					<input type="hidden" name="form_type" value="id">
+					<button class="form_input_button" type="submit">Select Question to Update/Delete</button>
+				</form>
+			{% endif %}
 		</div>	
-	{% if form %}
-	</form> 
-	<div class="quiz_container">
-		<h2>Add new question</h2>
-		<form method="POST" action="{{ url_for('edit_quiz') }}">
-			{{ form.csrf_token }}
-			<div class="form-group">
-				{{ form.quiz_id(value=quiz_id, class="form-control") }}
+		{% if form %}
+			<div class="quiz_container">
+				<h2>Add new question</h2>
+				<div class="form_choice">
+					<button class="form_input_button" type="button" onclick="show_multiple_choice()">Multiple Choice</button>
+					<button class="form_input_button" type="button" onclick="show_essay()">Essay</button>
+					<button class="form_input_button" type="button" onclick="show_radio()">Single Answer</button>
+				</div>
+				<form id="multiple_choice" method="POST" action="{{ url_for('edit_quiz') }}">
+					{{ form.csrf_token }}
+					<div class="form-group">
+						{{ form.quiz_id(value=quiz_id, class="form-control") }}
+					</div>
+					{{ form.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
+					<div class="form-group">
+						{{ form.answer_1(class="form-control_test", placeholder="Choice A") }}
+						{{ form.correct_answer_1(class="form-control_check") }}<br>
+						{{ form.answer_2(class="form-control_test", placeholder="Choice B") }}
+						{{ form.correct_answer_2(class="form-control_check") }}<br>
+						{{ form.answer_3(class="form-control_test", placeholder="Choice C") }}
+						{{ form.correct_answer_3(class="form-control_check") }}<br>
+						{{ form.answer_4(class="form-control_test", placeholder="Choice D") }}
+						{{ form.correct_answer_4(class="form-control_check") }}<br>
+					</div>
+					<input type="hidden" name="form_type" value="mc">
+					<button type="submit" class="form_input_button">Add new question</button>
+				</form>
+				<form id="essay" method="POST" action="{{ url_for('edit_quiz') }}">
+					{{ form_essay.csrf_token }}
+					<div class="form-group">
+						{{ form.quiz_id(value=quiz_id, class="form-control") }}
+					</div>
+					{{ form_essay.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
+					{{ form_essay.answer_1(value="None", type="hidden") }}
+					{{ form_essay.answer_2(value="None", type="hidden") }}
+					{{ form_essay.answer_3(value="None", type="hidden") }}
+					{{ form_essay.answer_4(value="None", type="hidden") }}
+					<input type="hidden" name="form_type" value="essay">
+					<button type="submit" class="form_input_button">Add new question</button>
+				</form>
+				<form id="single" method="POST" action="{{ url_for('edit_quiz') }}">
+					{{ form_radio.csrf_token }}
+					<div class="form-group">
+						{{ form.quiz_id(value=quiz_id, class="form-control") }}
+					</div>
+					{{ form_radio.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
+					{{ form_radio.correct_answer_1(class="form-control_check") }}<br>
+					{{ form_radio.answer_2(class="form-control_test", placeholder="Choice B") }}
+					{{ form_radio.correct_answer_2(class="form-control_check") }}<br>
+					{{ form_radio.answer_3(class="form-control_test", placeholder="Choice C") }}
+					{{ form_radio.correct_answer_3(class="form-control_check") }}<br>
+					{{ form_radio.answer_4(class="form-control_test", placeholder="Choice D") }}
+					{{ form_radio.correct_answer_4(class="form-control_check") }}<br>
+					<input type="hidden" name="form_type" value="single">
+					<button type="submit" class="form_input_button">Add new question</button>
+				</form>
 			</div>
-			<div class="form-group">
-				<label for="question">Question</label><br>
-				{{ form.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
-				{{ form.answer_1(class="form-control", placeholder="Choice A") }} Correct Answer{{ form.correct_answer_1(class="form-control") }}<br>
-				{{ form.answer_2(class="form-control", placeholder="Choice B") }} Correct Answer{{ form.correct_answer_2(class="form-control") }}
-				{{ form.answer_3(class="form-control", placeholder="Choice C") }} Correct Answer{{ form.correct_answer_3(class="form-control") }}
-				{{ form.answer_4(class="form-control", placeholder="Choice D") }} Correct Answer{{ form.correct_answer_4(class="form-control") }}
-			</div>
-			<button type="submit" class="form_input_button">Add new question</button>
-		</form>
-	{% endif %}
-	</div>
+			<script>
+				function show_multiple_choice() {
+					document.getElementById("multiple_choice").style.display = "block";
+					document.getElementById("essay").style.display = "none";
+					document.getElementById("single").style.display = "none";
+				}				
+				function show_essay() {
+					document.getElementById("essay").style.display = "block";
+					document.getElementById("multiple_choice").style.display = "none";
+					document.getElementById("single").style.display = "none";
+				}
+				function show_essay() {
+					document.getElementById("single").style.display = "block";
+					document.getElementById("multiple_choice").style.display = "none";
+					document.getElementById("essay").style.display = "none";
+				}
+				document.getElementById("essay").style.display = "none";
+				document.getElementById("single").style.display = "none";
+			</script>
+		{% endif %}
 	</div>
 {% endblock %}

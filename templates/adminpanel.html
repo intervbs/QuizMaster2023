@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Set admin rights to user</h1>
+<div class="main_container">
+    {% for user in users %}
+        {% if user.user_id != current_user.id %}
+            <div class="form-control">
+                <form method="POST" action="/adminpanel">
+                    {% if user.admin %}
+                        <input type="hidden" name="is_admin" value="{{ user.user_id, 0 }}">
+                    {% else %}
+                        <input type="hidden" name="is_admin" value="{{ user.user_id, 1 }}">
+                    {% endif %}
+                    <button type="submit" class="form_input_button">{{ user.firstname }} {{ user.lastname }}{% if user.admin %} (ADMIN){% endif %}</button>
+                </form>
+            </div>
+        {% endif %}
+	{% endfor %}
+</div> 
+{% endblock %}

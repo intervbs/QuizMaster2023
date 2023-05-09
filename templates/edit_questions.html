@@ -6,35 +6,29 @@
   	<form method="POST" action="{{ url_for('update') }}">
 		{{ form_edit.csrf_token}}
     	<div class="form-group">
-      		{{ form_edit.question_text.label }}
-      		{{ form_edit.question_text(class="form-control2") }}
-    	</div>
-		<div class="form-group">
-			{{ form_edit.answer_1.label }}
-			{{ form_edit.answer_1(class="form-control") }}
-			{{ form_edit.correct_answer_1(class="form-control") }}
-		</div>
-		<div class="form-group">
-			{{ form_edit.answer_2.label }}
-			{{ form_edit.answer_2(class="form-control") }}
-			{{ form_edit.correct_answer_2(class="form-control") }}
-		</div>
-		<div class="form-group">
-			{{ form_edit.answer_3.label }}
-			{{ form_edit.answer_3(class="form-control") }}
-			{{ form_edit.correct_answer_3(class="form-control") }}
-		</div>
-		<div class="form-group">
-			{{ form_edit.answer_4.label }}
-			{{ form_edit.answer_4(class="form-control") }}
-			{{ form_edit.correct_answer_4(class="form-control") }}
+			{{ form_edit.question_text(class="form-control2") }}<br><br>
+			{% if form_edit.q_type == 0 %}
+				{{ form_edit.answer_1(class="form-control_test") }}
+				{{ form_edit.correct_answer_1(class="form-control_check") }}<br>
+				{{ form_edit.answer_2(class="form-control_test") }}
+				{{ form_edit.correct_answer_2(class="form-control_check") }}<br>
+				{{ form_edit.answer_3(class="form-control_test") }}
+				{{ form_edit.correct_answer_3(class="form-control_check") }}<br>
+				{{ form_edit.answer_4(class="form-control_test") }}
+				{{ form_edit.correct_answer_4(class="form-control_check") }}
+			{% else %}
+				{{ form_edit.answer_1(value = 'None', type = "hidden", class="form-control_test") }}
+				{{ form_edit.answer_2(value = 'None', type = "hidden", class="form-control_test") }}
+				{{ form_edit.answer_3(value = 'None', type = "hidden", class="form-control_test") }}
+				{{ form_edit.answer_4(value = 'None', type = "hidden", class="form-control_test") }}
+			{% endif %}
 		</div>
 		{{ form_edit.question_id }}
 		<a>{{ form_edit.update(class="form_input_button") }}</a><br>
 	</form>
 	<form method="POST" action="{{ url_for('update') }}">
 		{{ form_edit.csrf_token }}
-		{{ form_edit.question_id() }}
+		{{ form_edit.question_id }}
 		<input type="hidden" name="delete" value="{{ form_edit.question_id.data }}">
 		<button type="submit" class="form_input_button" onclick="return confirm('Are you sure you want to delete this quiz?')">Delete Question</button>
 	</form>
