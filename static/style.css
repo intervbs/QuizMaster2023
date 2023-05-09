@@ -185,7 +185,7 @@ button {
 	resize: none;
 }
 .form-control_test {
-	width: 92%;
+	width: 46rem;
 	height: 50px;
 	resize: none;
 	display: inline-block;
@@ -199,11 +199,18 @@ button {
 	vertical-align: middle;
 }
 .form-control_check {
-	width: 6%;
-	height: 50px;
+	width: 48px;
+	height: 48px;
 	resize: none;
 	display: inline-block;
 	vertical-align: middle;
+}
+.form-control_right {
+	width: 45px;
+	height: 45px;
+	resize: none;
+	display: block;
+	float: right;
 }
 .form-control_check_grade {
 	width: 6%;

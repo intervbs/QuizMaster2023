@@ -266,6 +266,7 @@ def edit_quiz():
 
         elif form.validate_on_submit() and request.form['form_type'] == 'mc':
             # Add a new question to the database
+            print('MC')
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
@@ -284,6 +285,7 @@ def edit_quiz():
         
         elif form_essay.validate_on_submit() and request.form['form_type'] == 'essay':
             # Add a new question to the database
+            print('Essay')
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form.question_text.data, form_essay.answer_1.data,
@@ -300,14 +302,26 @@ def edit_quiz():
 
             return render_template('edit_quiz.html', form_quiz=form_quiz)
         
-        elif form_radio.validate_on_submit() and request.form['form_type'] == 'single':
+        elif form_radio.validate_on_submit():
             # Add a new question to the database
+            answer = request.form['form_type']
+            print(type(answer))
+            if answer == '1':
+                form_radio.correct_answer_1.data = True
+            elif answer == '2':
+                form_radio.correct_answer_2.data = True
+            elif answer == '3':
+                form_radio.correct_answer_3.data = True
+            elif answer == '4':
+                form_radio.correct_answer_4.data = True
+
+            print(form_radio.answer_1.data, form_radio.answer_2.data, form_radio.answer_3.data, form_radio.answer_4.data)
             quiz_id = form.quiz_id.data
             with myDB() as db:
-                db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
-                                form.correct_answer_1.data, form.answer_2.data, form.correct_answer_2.data,
-                                form.answer_3.data, form.correct_answer_3.data, form.answer_4.data,
-                                form.correct_answer_4.data, 2)
+                db.add_question(quiz_id, form_radio.question_text.data, form_radio.answer_1.data,
+                                form_radio.correct_answer_1.data, form_radio.answer_2.data, form_radio.correct_answer_2.data,
+                                form_radio.answer_3.data, form_radio.correct_answer_3.data, form_radio.answer_4.data,
+                                form_radio.correct_answer_4.data, 2)
                     
             with myDB() as db:
                 question_index = db.get_questions(quiz_id)

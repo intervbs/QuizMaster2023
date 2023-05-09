@@ -64,14 +64,10 @@
 						{{ form.quiz_id(value=quiz_id, class="form-control") }}
 					</div>
 					{{ form_radio.question_text(class="form-control2", placeholder="Enter a question") }}<br><br>
-					{{ form_radio.correct_answer_1(class="form-control_check") }}<br>
-					{{ form_radio.answer_2(class="form-control_test", placeholder="Choice B") }}
-					{{ form_radio.correct_answer_2(class="form-control_check") }}<br>
-					{{ form_radio.answer_3(class="form-control_test", placeholder="Choice C") }}
-					{{ form_radio.correct_answer_3(class="form-control_check") }}<br>
-					{{ form_radio.answer_4(class="form-control_test", placeholder="Choice D") }}
-					{{ form_radio.correct_answer_4(class="form-control_check") }}<br>
-					<input type="hidden" name="form_type" value="single">
+					<input type="radio" name="form_type" value="1" class="form-control_right">{{ form_radio.answer_1(class="form-control_test", placeholder="Choice A") }}<br>
+					<input type="radio" name="form_type" value="2" class="form-control_right">{{ form_radio.answer_2(class="form-control_test", placeholder="Choice B") }}<br>
+					<input type="radio" name="form_type" value="3" class="form-control_right">{{ form_radio.answer_3(class="form-control_test", placeholder="Choice C") }}<br>
+					<input type="radio" name="form_type" value="4" class="form-control_right">{{ form_radio.answer_4(class="form-control_test", placeholder="Choice D") }}<br>
 					<button type="submit" class="form_input_button">Add new question</button>
 				</form>
 			</div>
@@ -86,7 +82,7 @@
 					document.getElementById("multiple_choice").style.display = "none";
 					document.getElementById("single").style.display = "none";
 				}
-				function show_essay() {
+				function show_radio() {
 					document.getElementById("single").style.display = "block";
 					document.getElementById("multiple_choice").style.display = "none";
 					document.getElementById("essay").style.display = "none";
