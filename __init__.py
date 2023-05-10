@@ -305,7 +305,7 @@ def edit_quiz():
         elif form_radio.validate_on_submit():
             # Add a new question to the database
             answer = request.form['form_type']
-            print(type(answer))
+            # Check what radiobutton the is selected
             if answer == '1':
                 form_radio.correct_answer_1.data = True
             elif answer == '2':
@@ -315,7 +315,6 @@ def edit_quiz():
             elif answer == '4':
                 form_radio.correct_answer_4.data = True
 
-            print(form_radio.answer_1.data, form_radio.answer_2.data, form_radio.answer_3.data, form_radio.answer_4.data)
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form_radio.question_text.data, form_radio.answer_1.data,
@@ -355,7 +354,7 @@ def edit_quiz():
 
 
 @app.route('/update', methods = ['GET', 'POST'])
-@admin_required
+#@admin_required
 def update():
     # handels the delete request from edit question
     delete = request.form.get('delete')
@@ -365,7 +364,17 @@ def update():
             return redirect(url_for('edit_quiz'))
     form = forms.questions()
 
+    # Sets the correct value from the radiobutton to the user answer
     if form.validate_on_submit():
+        if request.form.get('form_type') == '1':
+            form.correct_answer_1.data = 1
+        elif request.form.get('form_type') == '2':
+            form.correct_answer_2.data = 1
+        elif request.form.get('form_type') == '3':
+            form.correct_answer_3.data = 1
+        elif request.form.get('form_type') == '4':
+            form.correct_answer_4.data = 1
+
         # Validates the form and update the question
         question_id     = int(form.question_id.data)
         question_text   = form.question_text.data.strip()
