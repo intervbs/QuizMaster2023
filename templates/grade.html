@@ -21,8 +21,8 @@
                     {{ form_answer.quiz_id }}
                     {{ form_answer.question_id }}
                     {% if form_answer.q_type.data == 0 or form_answer.q_type.data == 2 %}
-                        {{ form_answer.u_answer1.label(class="form-control_check_grade") }}
                         {{ form_answer.answer1.label(class="form-control_check_grade") }}
+                        {{ form_answer.u_answer1.label(class="form-control_check_grade") }}
                         {{ form_answer.choice_text1(class="form-control_grade") }}
                         {{ form_answer.u_answer1(class="form-control_check") }}
                         {{ form_answer.answer1(class="form-control_check") }}<br>
