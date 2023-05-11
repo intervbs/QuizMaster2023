@@ -2,16 +2,16 @@
 {% block content %}
 <div class="main_container">
     <div class="quiz_container">
-
+        <div class="form">
             {% for quizidx in quizidx %}
                 <h1>{{ quizidx.name }}</h1>
-                <p>Description</p><br>
+                <h3>Description</h3>
                 {{ quizidx.description }}<br>
-                <p>Category</p><br>
+                <h3>Category</h3>
                 {{ quizidx.category }}<br><br><br>
-                <a class="form_input_button" href="/questions?id={{ quizidx.quiz_id }}">Start Quiz</a>   	
+                <button class="form_input_button" onclick="location.href='{{ url_for('questions', id=quizidx.quiz_id) }}'">Start Quiz</button>
             {% endfor %}
-
+        </div>
 	</div>
 </div> 
 {% endblock %}

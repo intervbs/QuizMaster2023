@@ -52,6 +52,13 @@ form {
 	border-radius: 12px;	
 	display: inline-block;
 }
+.form {
+	width: 50rem;
+	margin: 0 auto;
+	color: #F9F7F0;	
+	border-radius: 12px;	
+	display: inline-block;
+}
 
 h1{
 	color: #fefefe;
