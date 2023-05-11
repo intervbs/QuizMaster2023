@@ -44,7 +44,7 @@
                     {{ form_answer.comment.label(class="form-control2") }}
                     {{ form_answer.comment(class="form-control2") }}
                     <input type="hidden" name="form_type" value="answer">
-                    <button class="form_input_button" type="submit">Update Comment</button>
+                    <button class="form_input_button" type="submit">Update Question Comment</button>
                 </form><br><br>
             {% endif %}
             {% if form_graded %}
@@ -54,7 +54,7 @@
                     {{ form_graded.is_graded.label(class="form-control") }}<br>
                     {{ form_graded.is_graded(class="form-control_test") }}<br>
                     <input type="hidden" name="form_type" value="graded">
-                    <button class="form_input_button" type="submit">Finish Grading Quiz</button>
+                    <button class="form_input_button" type="submit">Save Quiz Grading</button>
                 </form>
             {% endif %}
             <script>
