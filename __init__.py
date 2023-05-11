@@ -429,12 +429,26 @@ def grade():
     x = id.split()
     form_question = forms.Select_question()
     form_answer = forms.Answer_grade()
+    form_graded = forms.graded()
+
+    if request.method == 'POST' and request.form['form_type'] == 'graded':
+        with myDB() as db:
+            print('GRADED? ',form_graded.is_graded.data)
+            db.add_quiz_comment_graded(x[0], x[1], form_graded.comment.data, form_graded.is_graded.data)
+            form_graded.process()
+            quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
+            form_graded.comment.data = quiz_graded[0][3]
+            form_graded.is_graded.data = quiz_graded[0][4]
 
     if id != 'None':
         with myDB() as db:
             user = db.get_user_by_id(x[0])
             quiz = db.get_quiz_num(x[1])
             question_index = db.get_questions(x[1])
+            quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
+        if len(quiz_graded) >= 1:
+            form_graded.comment.data = quiz_graded[0][3]
+            form_graded.is_graded.data = quiz_graded[0][4]
         q_q = [quiz_questions(*x) for x in question_index]
         qc = [(str(q_c.question_id), q_c.question) for q_c in q_q]
         form_question.question.choices = qc
@@ -492,24 +506,22 @@ def grade():
             form_answer.u_answer4.data = False
             form_answer.comment.data
 
-        return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
-
     elif form_answer.validate_on_submit() and request.form['form_type'] == 'answer':
         if form_answer.aid.data != '':
             aid = int(form_answer.aid.data)
             comment = form_answer.comment.data
             with myDB() as db:
                 db.update_comment(aid, comment)
+            form_answer.process()
 
         else:
             text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
             with myDB() as db:
                 db.add_answer_with_comment((form_answer.user_id.data, form_answer.quiz_id.data, form_answer.question_id.data, 
                               False, False, False, False, text,), form_answer.comment.data)
+            form_answer.process()
         
-        return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
-
-    return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
+    return render_template('grade.html', form_graded=form_graded, name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 
     
 @app.route('/adminpanel', methods = ['POST', 'GET'])

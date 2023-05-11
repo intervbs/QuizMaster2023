@@ -132,6 +132,30 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
 
+    def add_quiz_comment_graded(self, *args):
+        try:
+            self.cursor.execute('select graded_id from quiz_graded where user_id = %s and quiz_id = %s', (args[0], args[1],))
+            result = self.cursor.fetchall()
+            if len(result) < 1:
+                self.cursor.execute('insert into quiz_graded (user_id, quiz_id) values (%s, %s)', (args[0], args[1],))
+                self.cursor.execute('select last_insert_id() as graded_id')
+                result = self.cursor.fetchall()
+                self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (args[2], args[3], result[0][0],))
+            else:
+                self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (args[2], args[3], result[0][0],))
+        except mysql.connector.Error as error:
+            print(error)
+
+    def get_quiz_comment_graded(self, user_id, quiz_id):
+        try:
+            self.cursor.execute('select * from quiz_graded where user_id = (%s) and quiz_id = (%s)', (user_id, quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+
+    def update_quiz_comment_graded():
+        pass
     #################
     #   QUESTIONS   #
     #################

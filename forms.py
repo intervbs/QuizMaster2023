@@ -24,6 +24,13 @@ class New_quiz(FlaskForm):
     category = TextAreaField('Category',[validators.Length(max = 50)], render_kw={'placeholder': 'Enter a category', 'style': 'background-color: #edf0f5;'})
     submit = SubmitField('Generate new quiz')
 
+class graded(FlaskForm):
+    user_id = HiddenField()
+    quiz_id = HiddenField()
+    is_graded = BooleanField('Graded',render_kw={'style': 'background-color: #edf0f5;'})
+    comment = TextAreaField('Comment Quiz', render_kw={'style': 'background-color: #edf0f5;'})
+    submit = SubmitField('Finish Grading Quiz')
+
 class questions(FlaskForm):
     user_id = HiddenField()
     quiz_id = HiddenField()

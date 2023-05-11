@@ -49,3 +49,13 @@ CREATE TABLE answers (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
 );
+
+CREATE TABLE quiz_graded (
+    graded_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    quiz_id INT NOT NULL,
+    comment TEXT DEFAULT NULL,
+    graded BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES accounts(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
+);

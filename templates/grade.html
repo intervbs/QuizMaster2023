@@ -9,7 +9,7 @@
                     {{ form_question.csrf_token }}
                     {{ form_question.question(class="form-control") }}<br>
                     <input type="hidden" name="form_type" value="question">
-                    <button class="form_input_button" type="submit">Select Quiz</button>
+                    <button class="form_input_button" type="submit">Select Question</button>
                 </form><br><br>
             {% endif %}	
             {% if form_answer.q_type.data == 0 or form_answer.q_type.data == 1 or form_answer.q_type.data == 2 %}
@@ -45,6 +45,16 @@
                     {{ form_answer.comment(class="form-control2") }}
                     <input type="hidden" name="form_type" value="answer">
                     <button class="form_input_button" type="submit">Update Comment</button>
+                </form><br><br>
+            {% endif %}
+            {% if form_graded %}
+                <form method="POST" action="{{ url_for('grade', id=request.args.get('id'), qid=request.args.get('qid')) }}">
+                    {{ form_graded.comment.label(class="form-control") }}
+                    {{ form_graded.comment(class="form-control2") }}<br>
+                    {{ form_graded.is_graded.label(class="form-control") }}<br>
+                    {{ form_graded.is_graded(class="form-control_test") }}<br>
+                    <input type="hidden" name="form_type" value="graded">
+                    <button class="form_input_button" type="submit">Finish Grading Quiz</button>
                 </form>
             {% endif %}
             <script>
