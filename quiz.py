@@ -27,7 +27,7 @@ class quiz_questions:
 
 class answered_question:
     def __init__(self, question_text, q_type, aid, choice1_selected, choice2_selected, choice3_selected, choice4_selected,
-                 essay_answer, comment, choice1_correct, choice2_correct, choice3_correct, choice4_correct,
+                 essay_answer, comment, graded, choice1_correct, choice2_correct, choice3_correct, choice4_correct,
                  choice1_text, choice2_text, choice3_text, choice4_text) -> None:
         self.q_txt = question_text
         self.q_type = q_type
@@ -46,6 +46,7 @@ class answered_question:
         self.c2_txt = choice2_text
         self.c3_txt = choice3_text
         self.c4_txt = choice4_text
+        self.graded = graded
 
 class all_users():
     def __init__(self, uid, fname, lname, email, pwh, uname, admin) -> None:

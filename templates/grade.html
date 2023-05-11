@@ -41,10 +41,12 @@
                         {{ form_answer.essay_answer(class="form-control2") }}<br>
                     {% endif %}
                     <br>
-                    {{ form_answer.comment.label(class="form-control2") }}
-                    {{ form_answer.comment(class="form-control2") }}
+                    {{ form_answer.comment.label(class="form-control_test") }}
+                    {{ form_answer.graded.label(class="form-control_right") }}<br>
+                    {{ form_answer.comment(class="form-control_grade_essay") }}
+                    {{ form_answer.graded(class="form-control_right") }}<br>
                     <input type="hidden" name="form_type" value="answer">
-                    <button class="form_input_button" type="submit">Update Question Comment</button>
+                    <button class="form_input_button" type="submit">Update Question Comment/Graded</button>
                 </form><br><br>
             {% endif %}
             {% if form_graded %}

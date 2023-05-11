@@ -140,9 +140,9 @@ class myDB:
                 self.cursor.execute('insert into quiz_graded (user_id, quiz_id) values (%s, %s)', (args[0], args[1],))
                 self.cursor.execute('select last_insert_id() as graded_id')
                 result = self.cursor.fetchall()
-                self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (args[2], args[3], result[0][0],))
+                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
             else:
-                self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (args[2], args[3], result[0][0],))
+                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
         except mysql.connector.Error as error:
             print(error)
 
@@ -154,8 +154,12 @@ class myDB:
             print(error)
         return result
 
-    def update_quiz_comment_graded():
-        pass
+    def update_quiz_comment_graded(self, comment, graded, graded_id):
+        try:
+            self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (comment, graded, graded_id,))
+        except mysql.connector.Error as error:
+            print(error)
+
     #################
     #   QUESTIONS   #
     #################
@@ -244,12 +248,12 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
     
-    def add_answer_with_comment(self, values, comment):
+    def add_answer_with_comment(self, values, comment, graded):
         try:
             self.add_answer(values)
             self.cursor.execute('SELECT LAST_INSERT_ID() AS answer_id')
             result = self.cursor.fetchall()
-            self.update_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}')
+            self.update_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}', graded)
         except mysql.connector.Error as error:
             print(error)
 
@@ -264,6 +268,7 @@ class myDB:
                     a.choice4_selected,
                     a.essay_answer,
                     a.comment,
+                    a.graded,
                     q.choice1_correct,
                     q.choice2_correct,
                     q.choice3_correct,
@@ -296,9 +301,9 @@ class myDB:
     #   COMMENT   #
     ###############
 
-    def update_comment(self, aid, comment):
+    def update_comment(self, aid, comment, graded):
         try:
-            self.cursor.execute('UPDATE answers SET comment = %s WHERE answer_id = %s', (comment, aid,))
+            self.cursor.execute('UPDATE answers SET comment = %s, graded = %s WHERE answer_id = %s', (comment, graded, aid,))
         except mysql.connector.Error as error:
             print(error)
 
@@ -312,6 +317,7 @@ class myDB:
             self.cursor.execute('DELETE FROM quizzes WHERE quiz_id = (%s)', (quiz_id,))
             self.cursor.execute('DELETE FROM questions WHERE quiz_id = (%s)', (quiz_id,))
             self.cursor.execute('DELETE FROM answers WHERE quiz_id = (%s)', (quiz_id,))
+            self.cursor.execute('DELETE FROM quiz_graded WHERE quiz_id = (%s)', (quiz_id,))
         except mysql.connector.Error as error:
             print(error)
     

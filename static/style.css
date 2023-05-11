@@ -198,6 +198,14 @@ button {
 	display: inline-block;
 	vertical-align: middle;
 }
+.form-control_grade_essay {
+	width: 740px;
+	height: 250px;
+	resize: none;
+	display: inline-block;
+	vertical-align: middle;
+	float: left;
+}
 .form-control_check {
 	width: 48px;
 	height: 48px;

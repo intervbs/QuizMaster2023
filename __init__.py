@@ -480,6 +480,8 @@ def grade():
             form_answer.u_answer4.data = question.a4_sel
             if question.comment != None:
                 form_answer.comment.data = question.comment
+            if question.graded != None:
+                form_answer.graded.data = question.graded
         
         else:
             # If the user did not complete the quiz and not every question is answered
@@ -504,21 +506,17 @@ def grade():
             form_answer.u_answer2.data = False
             form_answer.u_answer3.data = False
             form_answer.u_answer4.data = False
-            form_answer.comment.data
 
     elif form_answer.validate_on_submit() and request.form['form_type'] == 'answer':
         if form_answer.aid.data != '':
-            aid = int(form_answer.aid.data)
-            comment = form_answer.comment.data
             with myDB() as db:
-                db.update_comment(aid, comment)
+                db.update_comment(form_answer.aid.data, form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
-
         else:
             text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
             with myDB() as db:
                 db.add_answer_with_comment((form_answer.user_id.data, form_answer.quiz_id.data, form_answer.question_id.data, 
-                              False, False, False, False, text,), form_answer.comment.data)
+                              False, False, False, False, text,), form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
         
     return render_template('grade.html', form_graded=form_graded, name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
