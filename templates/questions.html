@@ -13,20 +13,27 @@
                 {{ form_question.question(class="form-control2") }}<br><br>
             </div>
             {% if form_question.q_type == 0 %}
-            <div class="form-group">
-                {{ form_question.answer1(class="form-control_test") }} 
-                {{ form.c_answer1(class="form-control_check") }}<br>
-                {{ form_question.answer2(class="form-control_test") }} 
-                {{ form.c_answer2(class="form-control_check") }}<br>
-                {{ form_question.answer3(class="form-control_test") }} 
-                {{ form.c_answer3(class="form-control_check") }}<br>
-                {{ form_question.answer4(class="form-control_test") }} 
-                {{ form.c_answer4(class="form-control_check") }}
-            </div>
-            {% else %}
+                <div class="form-group">
+                    {{ form_question.answer1(class="form-control_test") }} 
+                    {{ form.c_answer1(class="form-control_check") }}<br>
+                    {{ form_question.answer2(class="form-control_test") }} 
+                    {{ form.c_answer2(class="form-control_check") }}<br>
+                    {{ form_question.answer3(class="form-control_test") }} 
+                    {{ form.c_answer3(class="form-control_check") }}<br>
+                    {{ form_question.answer4(class="form-control_test") }} 
+                    {{ form.c_answer4(class="form-control_check") }}
+                </div>
+            {% elif form_question.q_type == 1 %}
                 <div class="form-group">
                     {{ form.essay_answer.label(class="form-control2") }}
                     {{ form.essay_answer(class="form-control2") }}
+                </div>
+            {% elif form_question.q_type == 2 %}
+                <div class="form-group">
+                    <input type="radio" name="form_type" value="1" class="form-control_right" {% if form.c_answer1.data == 1 %}checked{% endif %}>{{ form_question.answer1(class="form-control_test", placeholder="Choice A") }}<br>
+                    <input type="radio" name="form_type" value="2" class="form-control_right" {% if form.c_answer2.data == 1 %}checked{% endif %}>{{ form_question.answer2(class="form-control_test", placeholder="Choice B") }}<br>
+                    <input type="radio" name="form_type" value="3" class="form-control_right" {% if form.c_answer3.data == 1 %}checked{% endif %}>{{ form_question.answer3(class="form-control_test", placeholder="Choice C") }}<br>
+                    <input type="radio" name="form_type" value="4" class="form-control_right" {% if form.c_answer4.data == 1 %}checked{% endif %}>{{ form_question.answer4(class="form-control_test", placeholder="Choice D") }}<br>
                 </div>
             {% endif %}
             <div class="form-group">
@@ -40,8 +47,14 @@
     Do you want to save the quiz or just exit?<br>
         <div class="main_container">
             <div class="quiz_container">
-                <a class="form_input_button" href="/save?id={{ id }}&qid={{ qid }}">Save quiz to disk</a>
-                <a class="form_input_button" href="/loggedin">Exit Quiz</a>
+                <form action="/save" method="GET">
+                    <input type="hidden" name="id" value="{{ id }}">
+                    <input type="hidden" name="qid" value="{{ qid }}">
+                    <button type="submit" class="form_input_button">Save quiz to disk</button>
+                </form>
+                <div class="form">
+                    <button class="form_input_button" onclick="location.href='/loggedin'">Exit Quiz</button>
+                </div>
             </div>
         </div>
 {% endif %}

@@ -124,6 +124,15 @@ def questions():
     form = forms.Answer()
 
     if form.validate_on_submit():
+        if request.form.get('form_type') == '1':
+            form.c_answer1.data = 1
+        elif request.form.get('form_type') == '2':
+            form.c_answer2.data = 1
+        elif request.form.get('form_type') == '3':
+            form.c_answer3.data = 1
+        elif request.form.get('form_type') == '4':
+            form.c_answer4.data = 1
+            
         user_id = form.user_id.data
         quiz_id = form.quiz_id.data
         q_id = form.question_id.data
@@ -132,6 +141,7 @@ def questions():
         a3 = form.c_answer3.data
         a4 = form.c_answer4.data
         essay = form.essay_answer.data
+
         
         with myDB() as db:
             # Add the answe to the db and pulls up a new question

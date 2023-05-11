@@ -28,8 +28,8 @@
 				<button type="submit" class="form_input_button">Update Question</button><br>
 			</div>
 		{% elif form_edit.q_type == 2 %}
-		<div class="form-group">
-			{{ form_edit.question_text(class="form-control2") }}<br><br>
+			<div class="form-group">
+				{{ form_edit.question_text(class="form-control2") }}<br><br>
 				<input type="radio" name="form_type" value="1" class="form-control_right" {% if form_edit.correct_answer_1.data == 1 %}checked{% endif %}>{{ form_edit.answer_1(class="form-control_test", placeholder="Choice A") }}<br>
 				<input type="radio" name="form_type" value="2" class="form-control_right" {% if form_edit.correct_answer_2.data == 1 %}checked{% endif %}>{{ form_edit.answer_2(class="form-control_test", placeholder="Choice B") }}<br>
 				<input type="radio" name="form_type" value="3" class="form-control_right" {% if form_edit.correct_answer_3.data == 1 %}checked{% endif %}>{{ form_edit.answer_3(class="form-control_test", placeholder="Choice C") }}<br>
