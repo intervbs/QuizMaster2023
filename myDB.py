@@ -128,7 +128,7 @@ class myDB:
     
     def quiz_hide_show(self, quiz_id, value):
         try:
-            self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id))
+            self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
         except mysql.connector.Error as error:
             print(error)
 
@@ -159,6 +159,13 @@ class myDB:
             self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (comment, graded, graded_id,))
         except mysql.connector.Error as error:
             print(error)
+    
+    def open_close_quiz(self, quiz_id, is_open):
+        try:
+            self.cursor.execute('update quizzes set is_open = (%s) where quiz_id = (%s)', (is_open, quiz_id,))
+        except mysql.connector.Error as error:
+            print(error)
+
 
     #################
     #   QUESTIONS   #

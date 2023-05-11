@@ -55,13 +55,19 @@ def loggedin():
         '''When logged in the quizzes will be shown in a table'''
         # Some string manipulation for making the quiz public or not
         value = str(request.form.get('is_public')).replace('(','').replace(')','').replace(',','')
+        open = str(request.form.get('is_open')).replace('(','').replace(')','').replace(',','')
         delete = request.form.get('delete')
+        opn = open.split()
         x = value.split()
+        print(opn, x)
         with myDB() as db:
             if len(x) > 1:
                 db.quiz_hide_show(x[0], x[1])        
             elif delete != None:
                 db.delete_quiz(delete)
+            elif len(opn) > 1:
+                print(opn)
+                db.open_close_quiz(opn[0], opn[1])
             result = db.get_quiz_index()
             quizidx = [quiz_index(*x) for x in result]
         return render_template('loggedin.html', quizidx=quizidx)

@@ -53,6 +53,7 @@ class Answer(FlaskForm):
     question_id = HiddenField()
     quiz_id = HiddenField()
     q_type = HiddenField()
+    is_open = HiddenField()
     question = TextAreaField('Question', render_kw={'readonly': True, 'style': 'background-color: #edf0f5;'})
     answer1 = TextAreaField('question', render_kw={'readonly': True, 'style': 'background-color: #edf0f5;'})
     answer2 = TextAreaField('question', render_kw={'readonly': True, 'style': 'background-color: #edf0f5;'})

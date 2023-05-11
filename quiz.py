@@ -1,10 +1,11 @@
 class quiz_index:
-    def __init__(self, quiz_id, quizname, description, category, is_public) -> None:
+    def __init__(self, quiz_id, quizname, description, category, is_public, is_open) -> None:
         self.quiz_id        = quiz_id
         self.name           = quizname
         self.description    = description
         self.category       = category
         self.is_public      = is_public
+        self.is_open        = is_open
 
 class quiz_questions:
     def __init__(self, question_id, quiz_id, question_text, choice1_text, choice2_text, choice3_text, 
