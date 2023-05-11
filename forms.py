@@ -64,6 +64,7 @@ class Answer(FlaskForm):
 class Answer_grade(FlaskForm):
     user_id = HiddenField()
     question_id = HiddenField()
+    quiz_id = HiddenField()
     aid = HiddenField()
     q_type = HiddenField()
     q_txt = TextAreaField(render_kw={'style': 'background-color: #edf0f5;', 'readonly': True})

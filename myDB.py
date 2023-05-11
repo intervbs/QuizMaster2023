@@ -219,6 +219,15 @@ class myDB:
                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', values)
         except mysql.connector.Error as error:
             print(error)
+    
+    def add_answer_with_comment(self, values, comment):
+        try:
+            self.add_answer(values)
+            self.cursor.execute('SELECT LAST_INSERT_ID() AS answer_id')
+            result = self.cursor.fetchall()
+            self.update_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}')
+        except mysql.connector.Error as error:
+            print(error)
 
     def get_user_answers(self, user_id, question_id):
         try:
@@ -264,7 +273,6 @@ class myDB:
     ###############
 
     def update_comment(self, aid, comment):
-        print(type(aid), aid, type(comment), comment)
         try:
             self.cursor.execute('UPDATE answers SET comment = %s WHERE answer_id = %s', (comment, aid,))
         except mysql.connector.Error as error:

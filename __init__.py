@@ -235,7 +235,7 @@ def new_quiz():
     return render_template('newquiz.html', form=form, title='Make a new quiz')
 
 @app.route('/editquiz', methods=['GET', 'POST'])
-#@admin_required
+@admin_required
 def edit_quiz():
     '''Function to add, edit or delete questions in the quiz'''
     id = request.args.get('id')
@@ -354,7 +354,7 @@ def edit_quiz():
 
 
 @app.route('/update', methods = ['GET', 'POST'])
-#@admin_required
+@admin_required
 def update():
     # handels the delete request from edit question
     delete = request.form.get('delete')
@@ -443,40 +443,71 @@ def grade():
         qid = form_question.question.data
         with myDB() as db:
             result = db.get_user_answers(x[0], int(qid))
-        if result != None:
+        if len(result) > 0:
             question = answered_question(*result[0])
 
-        form_answer.user_id.data = x[0]
-        form_answer.question_id.data = qid
-        form_answer.aid.data = question.aid
-        form_answer.q_type.data = question.q_type
-        form_answer.q_txt.data = question.q_txt
-        form_answer.choice_text1.data = question.c1_txt
-        form_answer.choice_text2.data = question.c2_txt
-        form_answer.choice_text3.data = question.c3_txt
-        form_answer.choice_text4.data = question.c4_txt
-        form_answer.essay_answer.data = question.a_essay
-        form_answer.answer1.data = question.c1_cor
-        form_answer.answer2.data = question.c2_cor
-        form_answer.answer3.data = question.c3_cor
-        form_answer.answer4.data = question.c4_cor
-        form_answer.u_answer1.data = question.a1_sel
-        form_answer.u_answer2.data = question.a2_sel
-        form_answer.u_answer3.data = question.a3_sel
-        form_answer.u_answer4.data = question.a4_sel
-        if question.comment != None:
-            form_answer.comment.data = question.comment
+            form_answer.user_id.data = x[0]
+            form_answer.question_id.data = qid
+            form_answer.aid.data = question.aid
+            form_answer.q_type.data = question.q_type
+            form_answer.q_txt.data = question.q_txt
+            form_answer.choice_text1.data = question.c1_txt
+            form_answer.choice_text2.data = question.c2_txt
+            form_answer.choice_text3.data = question.c3_txt
+            form_answer.choice_text4.data = question.c4_txt
+            form_answer.essay_answer.data = question.a_essay
+            form_answer.answer1.data = question.c1_cor
+            form_answer.answer2.data = question.c2_cor
+            form_answer.answer3.data = question.c3_cor
+            form_answer.answer4.data = question.c4_cor
+            form_answer.u_answer1.data = question.a1_sel
+            form_answer.u_answer2.data = question.a2_sel
+            form_answer.u_answer3.data = question.a3_sel
+            form_answer.u_answer4.data = question.a4_sel
+            if question.comment != None:
+                form_answer.comment.data = question.comment
+        
+        else:
+            # If the user did not complete the quiz and not every question is answered
+            with myDB() as db:
+                q = db.get_question(int(qid))
+                question = quiz_questions(*q[0])
+            form_answer.user_id.data = x[0]
+            form_answer.quiz_id.data = x[1] 
+            form_answer.question_id.data = qid
+            form_answer.q_type.data = question.q_type
+            form_answer.q_txt.data = question.question
+            form_answer.choice_text1.data = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            form_answer.choice_text2.data = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            form_answer.choice_text3.data = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            form_answer.choice_text4.data = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            form_answer.essay_answer.data = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            form_answer.answer1.data = question.is_correct1
+            form_answer.answer2.data = question.is_correct2
+            form_answer.answer3.data = question.is_correct3
+            form_answer.answer4.data = question.is_correct4
+            form_answer.u_answer1.data = False
+            form_answer.u_answer2.data = False
+            form_answer.u_answer3.data = False
+            form_answer.u_answer4.data = False
+            form_answer.comment.data
 
         return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 
     elif form_answer.validate_on_submit() and request.form['form_type'] == 'answer':
-        aid = int(form_answer.aid.data)
-        comment = form_answer.comment.data
-        with myDB() as db:
-            db.update_comment(aid, comment)
-            print('UPDATED')
-            return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
+        if form_answer.aid.data != '':
+            aid = int(form_answer.aid.data)
+            comment = form_answer.comment.data
+            with myDB() as db:
+                db.update_comment(aid, comment)
 
+        else:
+            text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
+            with myDB() as db:
+                db.add_answer_with_comment((form_answer.user_id.data, form_answer.quiz_id.data, form_answer.question_id.data, 
+                              False, False, False, False, text,), form_answer.comment.data)
+        
+        return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 
     return render_template('grade.html', name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 

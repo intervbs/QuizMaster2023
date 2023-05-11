@@ -12,13 +12,15 @@
                     <button class="form_input_button" type="submit">Select Quiz</button>
                 </form><br><br>
             {% endif %}	
-            {% if form_answer.q_type.data == 0 or form_answer.q_type.data == 1%}
+            {% if form_answer.q_type.data == 0 or form_answer.q_type.data == 1 or form_answer.q_type.data == 2 %}
                 <form method="POST" action="{{ url_for('grade', id=request.args.get('id'), qid=request.args.get('qid')) }}">
                     {{ form_answer.csrf_token }}
                     {{ form_answer.q_txt(class="form-control2") }}<br>
                     {{ form_answer.user_id }}
                     {{ form_answer.aid }}
-                    {% if form_answer.q_type.data == 0 %}
+                    {{ form_answer.quiz_id }}
+                    {{ form_answer.question_id }}
+                    {% if form_answer.q_type.data == 0 or form_answer.q_type.data == 2 %}
                         {{ form_answer.u_answer1.label(class="form-control_check_grade") }}
                         {{ form_answer.answer1.label(class="form-control_check_grade") }}
                         {{ form_answer.choice_text1(class="form-control_grade") }}
