@@ -171,7 +171,10 @@ def questions():
             form.c_answer4.data = False
             return render_template('questions.html', form_question=form_question, form=form)
         else:
-            return render_template('questions.html', id=current_user.id, qid=quiz_id)
+            with myDB() as db:
+                graded = db.get_is_graded(current_user.id, quiz_id)
+                print(graded)
+            return render_template('questions.html', id=current_user.id, qid=quiz_id, graded=graded[0][0])
 
     elif q_id != None:
         # when entering the page it will find the first question if there is any
@@ -190,7 +193,10 @@ def questions():
             form_question.answer4.data = question.choice4
             form_question.q_type = question.q_type
         else:
-            return render_template('questions.html', id=current_user.id, qid=q_id)
+            with myDB() as db:
+                graded = db.get_is_graded(current_user.id, q_id)
+                print(graded[0][0])
+            return render_template('questions.html', id=current_user.id, qid=q_id, graded=graded[0][0])
    
     return render_template('questions.html', form_question=form_question, form=form)
 
@@ -467,11 +473,9 @@ def grade():
             if len(quiz_graded) > 0:
                 form_graded.comment.data = quiz_graded[0][3]
             else:
-                print('IM HERE NOW')
-                new_row = db.inser_quiz_graded_empty(x[0], x[1])
+                db.inser_quiz_graded_empty(x[0], x[1])
             
             # Sets the checkbox to True if all the answers have been graded
-            print('Now im here!')
             form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
             
         q_q = [quiz_questions(*x) for x in question_index]

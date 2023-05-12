@@ -132,6 +132,14 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
 
+    def get_is_graded(self, user_id, quiz_id):
+        try:
+            self.cursor.execute('SELECT graded FROM quiz_graded WHERE user_id = %s and quiz_id = %s', (user_id, quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+
     def inser_quiz_graded_empty(self, user_id, quiz_id):
         try:
             self.cursor.execute('insert into quiz_graded (user_id, quiz_id) values (%s, %s)', (user_id, quiz_id,))
