@@ -135,6 +135,7 @@ class myDB:
     def inser_quiz_graded_empty(self, user_id, quiz_id):
         try:
             self.cursor.execute('insert into quiz_graded (user_id, quiz_id) values (%s, %s)', (user_id, quiz_id,))
+            self.conn.commit()
             self.cursor.execute('select last_insert_id() as graded_id')
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:

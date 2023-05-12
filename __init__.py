@@ -463,12 +463,15 @@ def grade():
             quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
             
             # Checks if the table have a row for the quiz and user id. If there is no row then it will be created
-            if len(quiz_graded) >= 1:
+            print(len(quiz_graded))
+            if len(quiz_graded) > 0:
                 form_graded.comment.data = quiz_graded[0][3]
             else:
-                db.inser_quiz_graded_empty(x[0], x[1])
+                print('IM HERE NOW')
+                new_row = db.inser_quiz_graded_empty(x[0], x[1])
             
             # Sets the checkbox to True if all the answers have been graded
+            print('Now im here!')
             form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
             
         q_q = [quiz_questions(*x) for x in question_index]
