@@ -465,18 +465,10 @@ def grade():
             # Checks if the table have a row for the quiz and user id. If there is no row then it will be created
             if len(quiz_graded) >= 1:
                 form_graded.comment.data = quiz_graded[0][3]
-                graded_id = quiz_graded[0][0]
             else:
-                graded_id = db.inser_quiz_graded_empty(x[0], x[1])
+                db.inser_quiz_graded_empty(x[0], x[1])
             
             # Sets the checkbox to True if all the answers have been graded
-            print(answers_graded)
-            if any(answer[0] == 0 for answer in answers_graded) == True:
-                db.update_quiz_graded(graded_id, 0)
-                quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
-            if any(answer[0] == 0 for answer in answers_graded) == False:
-                db.update_quiz_graded(graded_id, 1)
-                quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
             form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
             
         q_q = [quiz_questions(*x) for x in question_index]
@@ -542,12 +534,16 @@ def grade():
             with myDB() as db:
                 db.update_comment(form_answer.aid.data, form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
+            print(answers_graded)
+            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
         else:
             text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
             with myDB() as db:
                 db.add_answer_with_comment((form_answer.user_id.data, form_answer.quiz_id.data, form_answer.question_id.data, 
                               False, False, False, False, text,), form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
+            print(answers_graded)
+            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
         
     return render_template('grade.html', form_graded=form_graded, name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 
