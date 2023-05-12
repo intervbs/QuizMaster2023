@@ -59,7 +59,6 @@ def loggedin():
         delete = request.form.get('delete')
         opn = open.split()
         x = value.split()
-        print(opn, x)
         with myDB() as db:
             if len(x) > 1:
                 db.quiz_hide_show(x[0], x[1])        
@@ -132,7 +131,7 @@ def questions():
             form.c_answer3.data = 1
         elif request.form.get('form_type') == '4':
             form.c_answer4.data = 1
-            
+
         user_id = form.user_id.data
         quiz_id = form.quiz_id.data
         q_id = form.question_id.data
@@ -147,12 +146,11 @@ def questions():
             # Add the answe to the db and pulls up a new question
             values = (user_id, quiz_id, q_id, a1, a2, a3, a4, essay)
             db.add_answer(values)
+            is_open = db.quiz_is_open(quiz_id)
             result = db.get_next_question_not_answered(user_id, q_id, quiz_id)
-        if len(result) > 0:
+        if len(result) > 0 and is_open[0] == 1:
             # Makes the new question, if there is a question that is not answered
             question = quiz_questions(*result[0])   
-            form_question = forms.Answer()
-            form = forms.Answer()
             form_question.process()
             form.process()
 
@@ -165,7 +163,7 @@ def questions():
             form_question.answer2.data = question.choice2
             form_question.answer3.data = question.choice3
             form_question.answer4.data = question.choice4
-            form_question.q_type.data = question.q_type
+            form_question.q_type = question.q_type
             form.c_answer1.data = False
             form.c_answer2.data = False
             form.c_answer3.data = False
@@ -177,8 +175,9 @@ def questions():
     elif q_id != None:
         # when entering the page it will find the first question if there is any
         with myDB() as db:
+            is_open = db.quiz_is_open(q_id)
             result = db.get_question_not_answered(current_user.id, q_id)
-        if len(result) > 0:
+        if len(result) > 0 and is_open[0] == 1:
             question = quiz_questions(*result[0])
             form.user_id.data = current_user.id
             form.quiz_id.data = question.quiz_id

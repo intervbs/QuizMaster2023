@@ -3,43 +3,54 @@
 {% if form %}
 <div class="main_container">
     <div class="quiz_container">
-        <form method="POST" action="{{ url_for('questions') }}">
-            {{ form_question.csrf_token}}
-            {{ form.quiz_id }}
-            {{ form.user_id }}
-            {{ form.question_id }}
-            <div class="form-group">
+        {% if form_question.q_type == 0 %}
+            <form method="POST" action="{{ url_for('questions') }}">
+                {{ form_question.csrf_token}}
+                {{ form.csrf_token }}
+                {{ form.quiz_id }}
+                {{ form.user_id }}
+                {{ form.question_id }}
                 {{ form_question.question.label(class="form-control2") }}
                 {{ form_question.question(class="form-control2") }}<br><br>
-            </div>
-            {% if form_question.q_type == 0 %}
-                <div class="form-group">
-                    {{ form_question.answer1(class="form-control_test") }} 
-                    {{ form.c_answer1(class="form-control_check") }}<br>
-                    {{ form_question.answer2(class="form-control_test") }} 
-                    {{ form.c_answer2(class="form-control_check") }}<br>
-                    {{ form_question.answer3(class="form-control_test") }} 
-                    {{ form.c_answer3(class="form-control_check") }}<br>
-                    {{ form_question.answer4(class="form-control_test") }} 
-                    {{ form.c_answer4(class="form-control_check") }}
-                </div>
-            {% elif form_question.q_type == 1 %}
-                <div class="form-group">
-                    {{ form.essay_answer.label(class="form-control2") }}
-                    {{ form.essay_answer(class="form-control2") }}
-                </div>
-            {% elif form_question.q_type == 2 %}
-                <div class="form-group">
-                    <input type="radio" name="form_type" value="1" class="form-control_right" {% if form.c_answer1.data == 1 %}checked{% endif %}>{{ form_question.answer1(class="form-control_test", placeholder="Choice A") }}<br>
-                    <input type="radio" name="form_type" value="2" class="form-control_right" {% if form.c_answer2.data == 1 %}checked{% endif %}>{{ form_question.answer2(class="form-control_test", placeholder="Choice B") }}<br>
-                    <input type="radio" name="form_type" value="3" class="form-control_right" {% if form.c_answer3.data == 1 %}checked{% endif %}>{{ form_question.answer3(class="form-control_test", placeholder="Choice C") }}<br>
-                    <input type="radio" name="form_type" value="4" class="form-control_right" {% if form.c_answer4.data == 1 %}checked{% endif %}>{{ form_question.answer4(class="form-control_test", placeholder="Choice D") }}<br>
-                </div>
-            {% endif %}
-            <div class="form-group">
+                {{ form_question.answer1(class="form-control_test") }} 
+                {{ form.c_answer1(class="form-control_check") }}<br>
+                {{ form_question.answer2(class="form-control_test") }} 
+                {{ form.c_answer2(class="form-control_check") }}<br>
+                {{ form_question.answer3(class="form-control_test") }} 
+                {{ form.c_answer3(class="form-control_check") }}<br>
+                {{ form_question.answer4(class="form-control_test") }} 
+                {{ form.c_answer4(class="form-control_check") }}
                 {{ form.next(class="form_input_button") }}
-            </div>
-        </form>
+            </form>
+        {% elif form_question.q_type == 1 %}
+            <form method="POST" action="{{ url_for('questions') }}">
+                {{ form_question.csrf_token}}
+                {{ form.csrf_token }}
+                {{ form.quiz_id }}
+                {{ form.user_id }}
+                {{ form.question_id }}
+                {{ form_question.question.label(class="form-control2") }}
+                {{ form_question.question(class="form-control2") }}<br><br>
+                {{ form.essay_answer.label(class="form-control2") }}
+                {{ form.essay_answer(class="form-control2") }}
+                {{ form.next(class="form_input_button") }}
+            </form>
+        {% elif form_question.q_type == 2 %}
+            <form method="POST" action="{{ url_for('questions') }}">
+                {{ form_question.csrf_token}}
+                {{ form.csrf_token }}
+                {{ form.quiz_id }}
+                {{ form.user_id }}
+                {{ form.question_id }}
+                {{ form_question.question.label(class="form-control2") }}
+                {{ form_question.question(class="form-control2") }}<br><br>
+                <input type="radio" name="form_type" value="1" class="form-control_right" {% if form.c_answer1.data == 1 %}checked{% endif %}>{{ form_question.answer1(class="form-control_test", placeholder="Choice A") }}<br>
+                <input type="radio" name="form_type" value="2" class="form-control_right" {% if form.c_answer2.data == 1 %}checked{% endif %}>{{ form_question.answer2(class="form-control_test", placeholder="Choice B") }}<br>
+                <input type="radio" name="form_type" value="3" class="form-control_right" {% if form.c_answer3.data == 1 %}checked{% endif %}>{{ form_question.answer3(class="form-control_test", placeholder="Choice C") }}<br>
+                <input type="radio" name="form_type" value="4" class="form-control_right" {% if form.c_answer4.data == 1 %}checked{% endif %}>{{ form_question.answer4(class="form-control_test", placeholder="Choice D") }}<br>
+                {{ form.next(class="form_input_button") }}
+            </form>
+        {% endif %}
     </div>
 </div>
 {% else %}

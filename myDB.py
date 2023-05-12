@@ -166,6 +166,14 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
 
+    def quiz_is_open(self, qid):
+        try:
+            self.cursor.execute('select is_open from quizzes where quiz_id = %s', (qid,))
+            result = self.cursor.fetchone()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+
 
     #################
     #   QUESTIONS   #
