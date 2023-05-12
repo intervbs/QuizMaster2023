@@ -3,6 +3,7 @@ import secrets
 from myDB import myDB
 from user import User
 from functools import wraps
+from helper import set_is_quiz_graded
 from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question
 from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 from flask_login import LoginManager, login_required, logout_user, current_user
@@ -14,9 +15,9 @@ login_manager.init_app(app)
 app.secret_key = secrets.token_urlsafe(16)
 
 #Error handling redirecting every error to index
-'''@app.errorhandler(Exception)
+@app.errorhandler(Exception)
 def page_not_found(error):
-    return redirect(url_for('index'))'''
+    return redirect(url_for('login'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -448,22 +449,36 @@ def grade():
 
     if request.method == 'POST' and request.form['form_type'] == 'graded':
         with myDB() as db:
-            print('GRADED? ',form_graded.is_graded.data)
             db.add_quiz_comment_graded(x[0], x[1], form_graded.comment.data, form_graded.is_graded.data)
             form_graded.process()
             quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
             form_graded.comment.data = quiz_graded[0][3]
-            form_graded.is_graded.data = quiz_graded[0][4]
 
     if id != 'None':
         with myDB() as db:
             user = db.get_user_by_id(x[0])
             quiz = db.get_quiz_num(x[1])
             question_index = db.get_questions(x[1])
+            answers_graded = db.check_answer_is_graded(x[0], x[1])
             quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
-        if len(quiz_graded) >= 1:
-            form_graded.comment.data = quiz_graded[0][3]
-            form_graded.is_graded.data = quiz_graded[0][4]
+            
+            # Checks if the table have a row for the quiz and user id. If there is no row then it will be created
+            if len(quiz_graded) >= 1:
+                form_graded.comment.data = quiz_graded[0][3]
+                graded_id = quiz_graded[0][0]
+            else:
+                graded_id = db.inser_quiz_graded_empty(x[0], x[1])
+            
+            # Sets the checkbox to True if all the answers have been graded
+            print(answers_graded)
+            if any(answer[0] == 0 for answer in answers_graded) == True:
+                db.update_quiz_graded(graded_id, 0)
+                quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
+            if any(answer[0] == 0 for answer in answers_graded) == False:
+                db.update_quiz_graded(graded_id, 1)
+                quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
+            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
+            
         q_q = [quiz_questions(*x) for x in question_index]
         qc = [(str(q_c.question_id), q_c.question) for q_c in q_q]
         form_question.question.choices = qc

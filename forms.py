@@ -27,7 +27,7 @@ class New_quiz(FlaskForm):
 class graded(FlaskForm):
     user_id = HiddenField()
     quiz_id = HiddenField()
-    is_graded = BooleanField('Graded?',render_kw={'style': 'background-color: #edf0f5;'})
+    is_graded = BooleanField('All questions graded',render_kw={'style': 'background-color: #edf0f5;'})
     comment = TextAreaField('Comment Quiz', render_kw={'style': 'background-color: #edf0f5;'})
     submit = SubmitField('Finish Grading Quiz')
 
