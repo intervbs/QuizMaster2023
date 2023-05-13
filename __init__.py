@@ -1,11 +1,12 @@
 import forms
 import secrets
+import pdfkit
+import helper
 from myDB import myDB
 from user import User
 from functools import wraps
-from helper import set_is_quiz_graded
 from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question
-from flask import Flask, render_template, request, redirect, url_for, make_response, flash, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask_login import LoginManager, login_required, logout_user, current_user
 
 app = Flask(__name__)
@@ -194,61 +195,41 @@ def questions():
         else:
             with myDB() as db:
                 graded = db.get_is_graded(current_user.id, q_id)
-                print(graded[0][0])
+                if len(graded) == 0:
+                    graded.append([0,])
             return render_template('questions.html', id=current_user.id, qid=q_id, graded=graded[0][0])
    
     return render_template('questions.html', form_question=form_question, form=form)
 
 @app.route('/save')
-#@login_required
+@login_required
 def save():
-    import xhtml2pdf.pisa as pisa
-    from io import BytesIO
+    '''This function will take go throug all questions and answers and write them into a .txt file.
+    The .txt will have the question, what the user answered and the correct answers'''
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
-    with myDB() as db:
-        # Retrieve the necessary data from the database
-        is_graded = db.get_quiz_comment_graded(user_id, quiz_id)
-        if is_graded[0][4] == 1:
-            answers_result = db.get_all_user_answers(int(user_id), int(quiz_id))
-        else:
-            return redirect(url_for('index'))
+    view = request.args.get('view')
+    print(type(view))
+    
+    if view == '1':
+        with myDB() as db:
+            is_graded = db.get_quiz_comment_graded(user_id, quiz_id)
+            if is_graded[0][4] == 1:
+                quizname = db.get_quiz_num(quiz_id)
+                results = db.get_all_user_answers(int(user_id), int(quiz_id))
+                answers = [answered_question(*x) for x in results]
+        form_graded = forms.graded()
+        form_graded.comment.data = quizname[0][3]
+        return render_template('save.html', form_graded=form_graded, answers=answers)
 
-    answers = [answered_question(*x) for x in answers_result]
-    form_graded = forms.graded()
-    form_graded.comment.data = is_graded[0][3]
-    rendered_page = render_template('save.html', answers=answers, form_graded=form_graded, request=request)
+    
+    output = helper.make_txt_file_for_download(user_id, quiz_id)
 
-    # Create a file-like buffer to receive PDF data
-    pdf_buffer = BytesIO()
-
-    # Define a custom filter to handle textarea rendering
-    def textarea_filter(element, max_len=None):
-        if element.attrib.get('class') == 'form-control2':
-            value = request.args.get(element.attrib.get('name'))
-            if value is not None:
-                element.text = value
-        return element
-
-    # Render the HTML template with the custom filter
-    rendered_html = render_template_string(rendered_page, textarea_filter=textarea_filter)
-
-    # Convert HTML to PDF
-    pisa_status = pisa.CreatePDF(rendered_html, dest=pdf_buffer)
-
-    if pisa_status.err:
-        # Handle the error if any
-        return 'Error converting HTML to PDF'
-
-    # Set the file position of the PDF buffer to the beginning
-    pdf_buffer.seek(0)
-
-    # Create a response object with the PDF content
-    response = make_response(pdf_buffer.getvalue())
-
-    # Set the content type and headers to indicate that this is a PDF file download
-    response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = "attachment; filename=quiz_results.pdf"
+    # Create a response object with the output as the file contents
+    response = make_response(output)
+    # Set the content type and headers to indicate that this is a text file download
+    response.headers["Content-Type"] = "text/plain"
+    response.headers["Content-Disposition"] = f"attachment; filename=quiz_results.txt"
 
     return response
 
@@ -479,7 +460,7 @@ def grade():
             answers_graded = db.check_answer_is_graded(x[0], x[1])
             quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
             
-            # Checks if the table have a row for the quiz and user id. If there is no row then it will be created
+            # Checks if the table have a answer for the quiz and user id. If there is no answer then it will be created
             print(len(quiz_graded))
             if len(quiz_graded) > 0:
                 form_graded.comment.data = quiz_graded[0][3]
@@ -487,7 +468,7 @@ def grade():
                 db.inser_quiz_graded_empty(x[0], x[1])
             
             # Sets the checkbox to True if all the answers have been graded
-            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
+            form_graded.is_graded.data = helper.set_is_quiz_graded(x[0], x[1])
             
         q_q = [quiz_questions(*x) for x in question_index]
         qc = [(str(q_c.question_id), q_c.question) for q_c in q_q]
@@ -553,7 +534,7 @@ def grade():
                 db.update_comment(form_answer.aid.data, form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
             print(answers_graded)
-            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
+            form_graded.is_graded.data = helper.set_is_quiz_graded(x[0], x[1])
         else:
             text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
             with myDB() as db:
@@ -561,7 +542,7 @@ def grade():
                               False, False, False, False, text,), form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
             print(answers_graded)
-            form_graded.is_graded.data = set_is_quiz_graded(x[0], x[1])
+            form_graded.is_graded.data = helper.set_is_quiz_graded(x[0], x[1])
         
     return render_template('grade.html', form_graded=form_graded, name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)
 

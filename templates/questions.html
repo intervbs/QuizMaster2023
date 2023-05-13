@@ -62,7 +62,13 @@
                     <form action="/save" method="GET">
                         <input type="hidden" name="id" value="{{ id }}">
                         <input type="hidden" name="qid" value="{{ qid }}">
-                        <button type="submit" class="form_input_button">Save quiz to disk</button>
+                        <button type="submit" class="form_input_button">Save Quiz To Disk</button>
+                    </form>
+                    <form action="/save" method="GET">
+                        <input type="hidden" name="id" value="{{ id }}">
+                        <input type="hidden" name="qid" value="{{ qid }}">
+                        <input type="hidden" name="view" value=1>
+                        <button type="submit" class="form_input_button">View Quiz And Answers</button>
                     </form>
                 {% else %}
                     <h2>Download quiz is not available due to Quiz is not graded yet, please check back later.</h2>
