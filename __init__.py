@@ -67,7 +67,6 @@ def loggedin():
             elif delete != None:
                 db.delete_quiz(delete)
             elif len(opn) > 1:
-                print(opn)
                 db.open_close_quiz(opn[0], opn[1])
             result = db.get_quiz_index()
             quizidx = [quiz_index(*x) for x in result]
@@ -209,7 +208,6 @@ def save():
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
     view = request.args.get('view')
-    print(type(view))
     
     if view == '1':
         with myDB() as db:
@@ -242,7 +240,6 @@ def new_quiz():
         name        = form.name.data.strip()
         description = form.description.data.strip()
         category    = form.category.data.strip()
-        print(name, description, category)
         with myDB() as db:
             db.add_new_quiz(name, description, category)
             return redirect(url_for('loggedin'))
@@ -280,7 +277,6 @@ def edit_quiz():
 
         elif form.validate_on_submit() and request.form['form_type'] == 'mc':
             # Add a new question to the database
-            print('MC')
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form.question_text.data, form.answer_1.data,
@@ -299,7 +295,6 @@ def edit_quiz():
         
         elif form_essay.validate_on_submit() and request.form['form_type'] == 'essay':
             # Add a new question to the database
-            print('Essay')
             quiz_id = form.quiz_id.data
             with myDB() as db:
                 db.add_question(quiz_id, form.question_text.data, form_essay.answer_1.data,
@@ -461,7 +456,6 @@ def grade():
             quiz_graded = db.get_quiz_comment_graded(x[0], x[1])
             
             # Checks if the table have a answer for the quiz and user id. If there is no answer then it will be created
-            print(len(quiz_graded))
             if len(quiz_graded) > 0:
                 form_graded.comment.data = quiz_graded[0][3]
             else:
@@ -533,7 +527,6 @@ def grade():
             with myDB() as db:
                 db.update_comment(form_answer.aid.data, form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
-            print(answers_graded)
             form_graded.is_graded.data = helper.set_is_quiz_graded(x[0], x[1])
         else:
             text = 'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED'
@@ -541,7 +534,6 @@ def grade():
                 db.add_answer_with_comment((form_answer.user_id.data, form_answer.quiz_id.data, form_answer.question_id.data, 
                               False, False, False, False, text,), form_answer.comment.data, form_answer.graded.data)
             form_answer.process()
-            print(answers_graded)
             form_graded.is_graded.data = helper.set_is_quiz_graded(x[0], x[1])
         
     return render_template('grade.html', form_graded=form_graded, name=f'{user[1]} {user[2]}', quizname=quiz[0][1], form_question=form_question, form_answer=form_answer)

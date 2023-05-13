@@ -22,7 +22,7 @@ def make_txt_file_for_download(user_id, quiz_id):
             answers = db.get_all_user_answers(int(user_id), int(quiz_id))
         else:
             return redirect(url_for('index'))
-    linebreak = '#########################################################################################'
+    linebreak = '======================================================================================='
     output = ''
     output += f'Quiz Name: {quizname[0][1]}\n\n{linebreak}\n\n'
     output += f'Quiz Comment:\n{is_graded[0][3]}\n\n{linebreak}\n\n'
@@ -41,7 +41,7 @@ def make_txt_file_for_download(user_id, quiz_id):
         choice4_text    = answer[17]
 
         if q_type == 0 or q_type == 2:
-            output += f'Question:\n{question_text}\n\nAnlternatives:\n'
+            output += f'Question:\n{question_text}\n\nAlternatives:\n'
             output += "Your Answer -->\t" + choice1_text + "\n\n" if choice1_selected == 1 else "\t\t" + choice1_text + "\n\n"
             output += "Your Answer -->\t" + choice2_text + "\n\n" if choice2_selected == 1 else "\t\t" + choice2_text + "\n\n"
             output += "Your Answer -->\t" + choice3_text + "\n\n" if choice3_selected == 1 else "\t\t" + choice3_text + "\n\n"
