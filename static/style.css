@@ -188,12 +188,14 @@ button {
 
 .form-control {
 	width: 100%;
-	height: 50px;
+	min-height: 50px;
+	height: auto;
 	resize: none;
 }
 .form-control_test {
 	width: 46rem;
-	height: 50px;
+	min-height: 50px;
+	height: auto;
 	resize: none;
 	display: inline-block;
 	vertical-align: middle;
@@ -239,7 +241,8 @@ button {
 }
 .form-control2 {
 	width: 100%;
-	height: 250px;
+	height: auto;
+	min-height: 250px;
 	resize: none;
 }
 

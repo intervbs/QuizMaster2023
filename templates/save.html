@@ -1,0 +1,41 @@
+
+<div class="main_container">
+    <div class="quiz_container">
+        <div class="form">
+            {{ form_graded.comment.label(class="form-control") }}
+            <textarea class="form-control2" name="question_id" placeholder="{{ form_graded.comment.data|replace('\r\n', '&#13;&#10;') }}"></textarea>
+        </div><br><br>
+        {% for answer in answers %}
+            {% if answer.q_type == 0 or answer.q_type == 2 %}
+                <div class="form">
+                    <label for="question_id">Question:</label>
+                    <textarea class="form-control" name="question_id" placeholder="{{ answer.q_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <label for="alt_id">Alternatives:</label>
+                    <textarea class="form-control_test" name="alt_id" placeholder="{{ answer.c1_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <input class="form-control_check" type="checkbox" name="booleanfield" id="booleanfield" {% if answer.a1_sel == 1 %}checked{% endif %}>
+                    <textarea class="form-control_test" name="alt_id" placeholder="{{ answer.c2_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <input class="form-control_check" type="checkbox" name="booleanfield" id="booleanfield" {% if answer.a2_sel == 1 %}checked{% endif %}>
+                    <textarea class="form-control_test" name="alt_id" placeholder="{{ answer.c3_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <input class="form-control_check" type="checkbox" name="booleanfield" id="booleanfield" {% if answer.a3_sel == 1 %}checked{% endif %}>
+                    <textarea class="form-control_test" name="alt_id" placeholder="{{ answer.c4_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <input class="form-control_check" type="checkbox" name="booleanfield" id="booleanfield" {% if answer.a4_sel == 1 %}checked{% endif %}>
+                    {% if answer.comment != '' %}
+                        <label for="comment_id">Question:</label>
+                        <textarea class="form-control" name="comment_id" placeholder="{{ answer.comment|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    {% endif %}
+                </div><br><br><br>
+            {% elif answer.q_type == 1 %}
+                <div class="form">
+                    <label for="question_id">Question:</label>
+                    <textarea class="form-control" name="question_id" placeholder="{{ answer.q_txt|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    <label for="essay_id">Answer:</label>
+                    <textarea class="form-control" name="essay_id" placeholder="{{ answer.a_essay|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    {% if answer.comment != '' %}
+                        <label for="comment_id">Question:</label>
+                        <textarea class="form-control" name="comment_id" placeholder="{{ answer.comment|replace('\r\n', '&#13;&#10;') }}"></textarea>
+                    {% endif %}
+                </div><br><br><br>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

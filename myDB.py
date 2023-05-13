@@ -327,6 +327,35 @@ class myDB:
             print(error)
         return result
     
+    def get_all_user_answers(self, user_id, quiz_id):
+        try:
+            sql ='''SELECT q.question_text,
+                    q.q_type,
+                    a.answer_id, 
+                    a.choice1_selected, 
+                    a.choice2_selected, 
+                    a.choice3_selected, 
+                    a.choice4_selected,
+                    a.essay_answer,
+                    a.comment,
+                    a.graded,
+                    q.choice1_correct,
+                    q.choice2_correct,
+                    q.choice3_correct,
+                    q.choice4_correct,
+                    q.choice1_text,
+                    q.choice2_text,
+                    q.choice3_text,
+                    q.choice4_text
+                    FROM answers a
+                    JOIN questions q ON a.question_id = q.question_id
+                    WHERE a.user_id = (%s) AND q.quiz_id = (%s)'''
+            self.cursor.execute(sql, (user_id, quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
     def check_answer_is_graded(self, user_id, quiz_id):
         try:
             self.cursor.execute('SELECT graded FROM answers where user_id = %s and quiz_id = %s', (user_id, quiz_id,))

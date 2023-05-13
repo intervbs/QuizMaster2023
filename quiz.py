@@ -39,6 +39,7 @@ class answered_question:
         self.a4_sel = choice4_selected
         self.a_essay = essay_answer
         self.comment = comment
+        self.graded = graded
         self.c1_cor = choice1_correct
         self.c2_cor = choice2_correct
         self.c3_cor = choice3_correct
@@ -47,7 +48,6 @@ class answered_question:
         self.c2_txt = choice2_text
         self.c3_txt = choice3_text
         self.c4_txt = choice4_text
-        self.graded = graded
 
 class all_users():
     def __init__(self, uid, fname, lname, email, pwh, uname, admin) -> None:

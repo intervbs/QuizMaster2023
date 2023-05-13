@@ -5,7 +5,7 @@ from user import User
 from functools import wraps
 from helper import set_is_quiz_graded
 from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question
-from flask import Flask, render_template, request, redirect, url_for, make_response, flash
+from flask import Flask, render_template, request, redirect, url_for, make_response, flash, render_template_string
 from flask_login import LoginManager, login_required, logout_user, current_user
 
 app = Flask(__name__)
@@ -173,7 +173,6 @@ def questions():
         else:
             with myDB() as db:
                 graded = db.get_is_graded(current_user.id, quiz_id)
-                print(graded)
             return render_template('questions.html', id=current_user.id, qid=quiz_id, graded=graded[0][0])
 
     elif q_id != None:
@@ -201,43 +200,55 @@ def questions():
     return render_template('questions.html', form_question=form_question, form=form)
 
 @app.route('/save')
-@login_required
+#@login_required
 def save():
-    '''This function will take go throug all questions and answers and write them into a .txt file.
-    The .txt will have the question, what the user answered and the correct answers'''
+    import xhtml2pdf.pisa as pisa
+    from io import BytesIO
     user_id = request.args.get('id')
     quiz_id = request.args.get('qid')
     with myDB() as db:
-        answers = db.get_user_answers(int(user_id), int(quiz_id))
-    
-    output = ''
-    for row in answers:
-        question_text = row[0]
-        choice1_selected = row[1]
-        choice2_selected = row[2]
-        choice3_selected = row[3]
-        choice4_selected = row[4]
-        choice1_correct = row[5]
-        choice2_correct = row[6]
-        choice3_correct = row[7]
-        choice4_correct = row[8]
-        choice1_text    = row[9]
-        choice2_text    = row[10]
-        choice3_text    = row[11]
-        choice4_text    = row[12]
+        # Retrieve the necessary data from the database
+        is_graded = db.get_quiz_comment_graded(user_id, quiz_id)
+        if is_graded[0][4] == 1:
+            answers_result = db.get_all_user_answers(int(user_id), int(quiz_id))
+        else:
+            return redirect(url_for('index'))
 
-        output += f"{question_text}\n"
-        output += f"{choice1_text} || Your Choice: {choice1_selected} || (Correct: {choice1_correct})\n"
-        output += f"{choice2_text} || Your Choice: {choice2_selected} || (Correct: {choice2_correct})\n"
-        output += f"{choice3_text} || Your Choice: {choice3_selected} || (Correct: {choice3_correct})\n"
-        output += f"{choice4_text} || Your Choice: {choice4_selected} || (Correct: {choice4_correct})\n\n"
+    answers = [answered_question(*x) for x in answers_result]
+    form_graded = forms.graded()
+    form_graded.comment.data = is_graded[0][3]
+    rendered_page = render_template('save.html', answers=answers, form_graded=form_graded, request=request)
 
-    # Create a response object with the output as the file contents
-    response = make_response(output)
+    # Create a file-like buffer to receive PDF data
+    pdf_buffer = BytesIO()
 
-    # Set the content type and headers to indicate that this is a text file download
-    response.headers["Content-Type"] = "text/plain"
-    response.headers["Content-Disposition"] = f"attachment; filename=quiz_results.txt"
+    # Define a custom filter to handle textarea rendering
+    def textarea_filter(element, max_len=None):
+        if element.attrib.get('class') == 'form-control2':
+            value = request.args.get(element.attrib.get('name'))
+            if value is not None:
+                element.text = value
+        return element
+
+    # Render the HTML template with the custom filter
+    rendered_html = render_template_string(rendered_page, textarea_filter=textarea_filter)
+
+    # Convert HTML to PDF
+    pisa_status = pisa.CreatePDF(rendered_html, dest=pdf_buffer)
+
+    if pisa_status.err:
+        # Handle the error if any
+        return 'Error converting HTML to PDF'
+
+    # Set the file position of the PDF buffer to the beginning
+    pdf_buffer.seek(0)
+
+    # Create a response object with the PDF content
+    response = make_response(pdf_buffer.getvalue())
+
+    # Set the content type and headers to indicate that this is a PDF file download
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=quiz_results.pdf"
 
     return response
 
