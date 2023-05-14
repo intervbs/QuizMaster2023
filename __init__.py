@@ -81,11 +81,11 @@ def loggedin():
                 result[i] = result[i] + (ap,)
                 if ap == 0:
                     db.quiz_hide_show(result[i][0], '0')
-            result = db.get_quiz_index()
-            for i in range(len(result)):
-                ap = helper.check_if_quiz_is_approved(result[i][0])
-                result[i] = result[i] + (ap,)
-            quizidx = [quiz_index_approved(*x) for x in result]
+            res = db.get_quiz_index()
+            for i in range(len(res)):
+                ap = helper.check_if_quiz_is_approved(res[i][0])
+                res[i] = res[i] + (ap,)
+            quizidx = [quiz_index_approved(*x) for x in res]
         return render_template('loggedin.html', quizidx=quizidx)
 
 @app.route('/logout', methods=["GET", "POST"])
@@ -131,6 +131,39 @@ def quiz():
             result = db.get_quiz_num(quiz_id)
         quizidx = [quiz_index(*x) for x in result]
         return render_template('quiz.html', quizidx=quizidx)
+
+@app.route('/approve', methods = ['POST', 'GET'])
+@admin_required
+def approve():
+    quiz_id = request.args.get('id')
+    form_question = forms.Answer()
+
+    if form_question.validate_on_submit():
+        with myDB() as db:
+            if request.args.get('delete'):
+                db.delete_question(form_question.question_id.data)
+            else:
+                db.approve_question(form_question.question_id.data)
+                return redirect(url_for('approve', id=form_question.quiz_id.data))
+    if quiz_id != None:
+        # when entering the page it will find the first question if there is any
+        with myDB() as db:
+            result = db.get_question_not_approved(quiz_id)
+        if len(result) > 0:
+            question = quiz_questions(*result[0])
+            form_question.quiz_id.data = question.quiz_id
+            form_question.question_id.data = question.question_id
+            form_question.question.data = question.question
+            form_question.answer1.data = question.choice1
+            form_question.answer2.data = question.choice2
+            form_question.answer3.data = question.choice3
+            form_question.answer4.data = question.choice4
+            form_question.q_type = question.q_type
+
+            return render_template('approve.html', form_question=form_question, id=quiz_id)
+   
+    return render_template('approve.html', id=quiz_id)
+
     
 @app.route('/questions', methods = ['GET', 'POST'])
 @login_required

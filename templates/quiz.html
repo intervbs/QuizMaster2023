@@ -9,7 +9,11 @@
                 {{ quizidx.description }}<br>
                 <h3>Category</h3>
                 {{ quizidx.category }}<br><br><br>
-                <button class="form_input_button" onclick="location.href='{{ url_for('questions', id=quizidx.quiz_id) }}'">Start Quiz</button>
+                {% if current_user.is_admin %}
+                    <button class="form_input_button" onclick="location.href='{{ url_for('approve', id=quizidx.quiz_id) }}'">Start Approving Quiz</button>
+                {% else %}
+                    <button class="form_input_button" onclick="location.href='{{ url_for('questions', id=quizidx.quiz_id) }}'">Start Quiz</button>
+                {% endif %}
             {% endfor %}
         </div>
 	</div>

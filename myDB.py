@@ -247,6 +247,14 @@ class myDB:
             print(error)
         return result
     
+    def get_question_not_approved(self, quiz_id):
+        try:
+            self.cursor.execute('SELECT * FROM questions WHERE quiz_id = %s AND question_approved = 0 LIMIT 1', (quiz_id,))
+            result = self.cursor.fetchall()
+        except mysql.connector.Error as error:
+            print(error)
+        return result
+    
     def add_question(self, quiz_id, question_text, answer_1, correct_answer_1,
                    answer_2, correct_answer_2, answer_3, correct_answer_3,
                    answer_4, correct_answer_4, q_type):
@@ -262,6 +270,12 @@ class myDB:
     def quiz_answer(self, user_id, question_id, answer):
         try:
             self.cursor.execute('INSERT INTO answers (user_id, question_id, answer_text) VALUES (%s, %s, %s)', (user_id, question_id, answer))
+        except mysql.connector.Error as error:
+            print(error)
+
+    def approve_question(self, question_id):
+        try:
+            self.cursor.execute('UPDATE questions SET question_approved = 1 WHERE question_id =%s', (question_id,))
         except mysql.connector.Error as error:
             print(error)
 
