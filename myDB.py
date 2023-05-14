@@ -1,4 +1,5 @@
 import mysql.connector
+import helper
 from werkzeug.security import generate_password_hash
 
 class myDB:
@@ -128,7 +129,10 @@ class myDB:
     
     def quiz_hide_show(self, quiz_id, value):
         try:
-            self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
+            if helper.check_if_quiz_is_approved(quiz_id):
+                self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
+            if value == '0':
+                self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
         except mysql.connector.Error as error:
             print(error)
 
@@ -272,7 +276,8 @@ class myDB:
                         choice1_correct = (%s), 
                         choice2_correct = (%s), 
                         choice3_correct = (%s), 
-                        choice4_correct = (%s) 
+                        choice4_correct = (%s),
+                        question_approved = (%s) 
                         WHERE question_id = (%s)'''
             self.cursor.execute(sql, test)
         except mysql.connector.Error as error:

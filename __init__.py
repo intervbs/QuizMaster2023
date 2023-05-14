@@ -5,7 +5,7 @@ import helper
 from myDB import myDB
 from user import User
 from functools import wraps
-from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question
+from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question, quiz_index_approved
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask_login import LoginManager, login_required, logout_user, current_user
 
@@ -58,18 +58,34 @@ def loggedin():
         # Some string manipulation for making the quiz public or not
         value = str(request.form.get('is_public')).replace('(','').replace(')','').replace(',','')
         open = str(request.form.get('is_open')).replace('(','').replace(')','').replace(',','')
+        approved = str(request.form.get('approved')).replace('(','').replace(')','').replace(',','')
         delete = request.form.get('delete')
         opn = open.split()
+        appro = approved.split()
         x = value.split()
         with myDB() as db:
             if len(x) > 1:
-                db.quiz_hide_show(x[0], x[1])        
+                db.quiz_hide_show(x[0], x[1]) 
+            elif len(appro) > 1:
+                questions = db.get_questions(appro[0])
+                for question in questions:
+                    db.update_question((question[2], question[3], question[4], question[5], question[6], 
+                                        question[8], question[9], question[10], question[11], appro[1], question[0],))
             elif delete != None:
                 db.delete_quiz(delete)
             elif len(opn) > 1:
                 db.open_close_quiz(opn[0], opn[1])
             result = db.get_quiz_index()
-            quizidx = [quiz_index(*x) for x in result]
+            for i in range(len(result)):
+                ap = helper.check_if_quiz_is_approved(result[i][0])
+                result[i] = result[i] + (ap,)
+                if ap == 0:
+                    db.quiz_hide_show(result[i][0], '0')
+            result = db.get_quiz_index()
+            for i in range(len(result)):
+                ap = helper.check_if_quiz_is_approved(result[i][0])
+                result[i] = result[i] + (ap,)
+            quizidx = [quiz_index_approved(*x) for x in result]
         return render_template('loggedin.html', quizidx=quizidx)
 
 @app.route('/logout', methods=["GET", "POST"])
@@ -385,18 +401,18 @@ def update():
             form.correct_answer_4.data = 1
 
         # Validates the form and update the question
-        question_id     = int(form.question_id.data)
-        question_text   = form.question_text.data.strip()
-        answer_1        = form.answer_1.data.strip()
-        answer_2        = form.answer_2.data.strip()
-        answer_3        = form.answer_3.data.strip()
-        answer_4        = form.answer_4.data.strip()
-        correct_answer_1 = int(form.correct_answer_1.data)
-        correct_answer_2 = int(form.correct_answer_2.data)
-        correct_answer_3 = int(form.correct_answer_3.data)
-        correct_answer_4 = int(form.correct_answer_4.data)
+        question_id     = form.question_id.data
+        question_text   = form.question_text.data.strip
+        answer_1        = form.answer_1.data
+        answer_2        = form.answer_2.data
+        answer_3        = form.answer_3.data
+        answer_4        = form.answer_4.data
+        correct_answer_1 = form.correct_answer_1.data
+        correct_answer_2 = form.correct_answer_2.data
+        correct_answer_3 = form.correct_answer_3.data
+        correct_answer_4 = form.correct_answer_4.data
         values = (question_text, answer_1, answer_2, answer_3, answer_4, 
-                  correct_answer_1, correct_answer_2, correct_answer_3,  correct_answer_4, question_id)
+                  correct_answer_1, correct_answer_2, correct_answer_3,  correct_answer_4, question_id, 0)
         with myDB() as db:
             db.update_question(values)
         return redirect(url_for('edit_quiz'))

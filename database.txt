@@ -59,3 +59,6 @@ CREATE TABLE quiz_graded (
     FOREIGN KEY (user_id) REFERENCES accounts(user_id) ON DELETE CASCADE,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
+
+ onclick="confirmButtonPressed(event, 'Are you sure you want to approve all questions in the quiz?')"
+ onclick="confirmButtonPressed(event, 'are you sure you want to REVOKE the approved quiz?')"

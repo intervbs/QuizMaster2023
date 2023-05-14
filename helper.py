@@ -1,6 +1,15 @@
 from myDB import myDB
 from flask import redirect, url_for
 
+def check_if_quiz_is_approved(quiz_id):
+    '''Sets the checkbox to True/False if all the answers have been graded'''
+    with myDB() as db:
+        result = db.get_questions(quiz_id)
+        if any(answer[12] == 0 for answer in result) == True:
+            return 0
+        if any(answer[12] == 0 for answer in result) == False:
+            return 1
+
 def set_is_quiz_graded(user_id, quiz_id):
     '''Sets the checkbox to True/False if all the answers have been graded'''
     with myDB() as db:

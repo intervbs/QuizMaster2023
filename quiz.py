@@ -7,6 +7,11 @@ class quiz_index:
         self.is_public      = is_public
         self.is_open        = is_open
 
+class quiz_index_approved(quiz_index):
+    def __init__(self, quiz_id, quizname, description, category, is_public, is_open, approved) -> None:
+        super().__init__(quiz_id, quizname, description, category, is_public, is_open)
+        self.is_approved    = approved
+
 class quiz_questions:
     def __init__(self, question_id, quiz_id, question_text, choice1_text, choice2_text, choice3_text, 
                  choice4_text, essay, choice1_correct, choice2_correct, choice3_correct, choice4_correct, 

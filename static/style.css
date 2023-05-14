@@ -143,6 +143,7 @@ div {
     margin: 7px 0;
     width: 100%;
     font-size: 18px;
+	max-height: 80px;
 }
 .form_input_button:hover {
 	opacity: 0.6;
