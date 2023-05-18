@@ -136,15 +136,17 @@ def quiz():
 def approve():
     quiz_id = request.args.get('id')
     form_question = forms.Answer()
-
-    if form_question.validate_on_submit():
-        with myDB() as db:
-            if request.args.get('delete'):
-                db.delete_question(form_question.question_id.data)
-            else:
-                db.approve_question(form_question.question_id.data)
-                return redirect(url_for('approve', id=form_question.quiz_id.data))
+    print(request.form.get('delete'))
     if quiz_id != None:
+        if form_question.validate_on_submit():
+            with myDB() as db:
+                if request.form.get('delete') == 'delete':
+                    print(form_question.question_id.data)
+                    db.delete_question(int(form_question.question_id.data))
+                    return redirect(url_for('approve', id=form_question.quiz_id.data))
+                else:
+                    db.approve_question(form_question.question_id.data)
+                #return redirect(url_for('approve', id=form_question.quiz_id.data))
         # when entering the page it will find the first question if there is any
         with myDB() as db:
             result = db.get_question_not_approved(quiz_id)
