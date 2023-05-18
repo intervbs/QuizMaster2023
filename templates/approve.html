@@ -52,9 +52,9 @@
                 <input type="radio" name="form_type" value="4" class="form-control_right" {% if form_question.c_answer4.data == 1 %}checked{% endif %}>{{ form_question.answer4(class="form-control_test", placeholder="Choice D") }}<br>
                 <button class="form_input_button" name="button">Approve Question</button>
             </form>
-            <form method="POST" action="/loggedin">
+            <form method="POST" action="/approve">
                 <input type="hidden" name="delete" value="{{ form_question.quiz_id }}">
-                <button class="form_input_button" type="submit" onclick="confirmButtonPressed(event, 'Are you sure you want to delete this quiz?\nThis will delete all the questions and answers related to it.')">Delete Quiz</button>
+                <button class="form_input_button" type="submit" onclick="confirmButtonPressed(event, 'Are you sure you want to delete this question?')">Delete Quiz</button>
             </form>
         {% endif %}
         <script>

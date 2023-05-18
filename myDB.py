@@ -72,9 +72,9 @@ class myDB:
     
     def add_new_user(self, username, password, firstname, lastname, email):
         try: 
-            sql = 'insert into accounts (first_name, last_name, email, password, username) values (%s, %s, %s, %s, %s)'
-            values = (firstname, lastname, email, generate_password_hash(password), username)
-            self.cursor.execute(sql, values)
+            sql = 'INSERT INTO accounts (first_name, last_name, email, password, username) VALUES (%s, %s, %s, %s, %s)'
+            VALUES = (firstname, lastname, email, generate_password_hash(password), username)
+            self.cursor.execute(sql, VALUES)
         except mysql.connector.Error as error:
              print(error)
     
@@ -123,7 +123,7 @@ class myDB:
     
     def add_new_quiz(self, name, description, category):
         try:
-            self.cursor.execute('insert into quizzes (name, description, category) values (%s, %s, %s)', (name, description, category))
+            self.cursor.execute('INSERT INTO quizzes (name, description, category) VALUES (%s, %s, %s)', (name, description, category))
         except mysql.connector.Error as error:
             print(error)
     
@@ -146,9 +146,9 @@ class myDB:
 
     def inser_quiz_graded_empty(self, user_id, quiz_id):
         try:
-            self.cursor.execute('insert into quiz_graded (user_id, quiz_id) values (%s, %s)', (user_id, quiz_id,))
+            self.cursor.execute('INSERT INTO quiz_graded (user_id, quiz_id) VALUES (%s, %s)', (user_id, quiz_id,))
             self.conn.commit()
-            self.cursor.execute('select last_insert_id() as graded_id')
+            self.cursor.execute('select last_INSERT_id() as graded_id')
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -194,16 +194,16 @@ class myDB:
             print(error)
         return result
 
-    def get_all_quizzes(self, user_id):
+    '''def get_all_quizzes(self, user_id):
         try:
-            self.cursor.execute('''SELECT DISTINCT q.quiz_id, q.name, q.description, q.category, q.is_public
+            self.cursor.execute(SELECT DISTINCT q.quiz_id, q.name, q.description, q.category, q.is_public
                                     FROM quizzes q
                                     INNER JOIN answers a ON q.quiz_id = a.quiz_id
-                                    WHERE a.user_id = %s''', (user_id,))
+                                    WHERE a.user_id = %s, (user_id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
-        return result
+        return result'''
 
     #################
     #   QUESTIONS   #
@@ -259,19 +259,19 @@ class myDB:
                    answer_2, correct_answer_2, answer_3, correct_answer_3,
                    answer_4, correct_answer_4, q_type):
         try:
-            self.cursor.execute('''insert into questions 
+            self.cursor.execute('''INSERT INTO questions 
                                 (quiz_id, question_text, choice1_text, choice2_text, choice3_text, choice4_text, 
                                 choice1_correct, choice2_correct, choice3_correct, choice4_correct, q_type	)
-                                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
                                 (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4, q_type))
         except mysql.connector.Error as error:
             print(error)
 
-    def quiz_answer(self, user_id, question_id, answer):
+    '''def quiz_answer(self, user_id, question_id, answer):
         try:
             self.cursor.execute('INSERT INTO answers (user_id, question_id, answer_text) VALUES (%s, %s, %s)', (user_id, question_id, answer))
         except mysql.connector.Error as error:
-            print(error)
+            print(error)'''
 
     def approve_question(self, question_id):
         try:
@@ -301,16 +301,16 @@ class myDB:
     #   ANSWERS   #
     ############### 
 
-    def add_answer(self, values):
+    def add_answer(self, VALUES):
         try:
             self.cursor.execute('''INSERT INTO answers (user_id, quiz_id, question_id, choice1_selected, choice2_selected, choice3_selected, choice4_selected, essay_answer)
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', values)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', VALUES)
         except mysql.connector.Error as error:
             print(error)
     
-    def add_answer_with_comment(self, values, comment, graded):
+    def add_answer_with_comment(self, VALUES, comment, graded):
         try:
-            self.add_answer(values)
+            self.add_answer(VALUES)
             self.cursor.execute('SELECT LAST_INSERT_ID() AS answer_id')
             result = self.cursor.fetchall()
             self.update_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}', graded)

@@ -1,11 +1,10 @@
 import forms
 import secrets
-import pdfkit
 import helper
 from myDB import myDB
 from user import User
 from functools import wraps
-from quiz import quiz_index, quiz_questions, all_users, all_user_answers, answered_question, quiz_index_approved
+from quiz import quiz_index, quiz_questions, all_users, answered_question, quiz_index_approved
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask_login import LoginManager, login_required, logout_user, current_user
 

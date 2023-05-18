@@ -30,7 +30,7 @@ CREATE TABLE questions (
     choice3_correct tinyint(1) NOT NULL DEFAULT 0,
     choice4_correct tinyint(1) NOT NULL DEFAULT 0,
     question_approved tinyint(1) NOT NULL DEFAULT 0,
-    is_essay BOOLEAN NOT NULL DEFAULT FALSE,
+    q_type tinyint(1) NOT NULL DEFAULT 0 COMMENT '0 = MC, 1 = Essay, 2 = Single'
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 
@@ -45,6 +45,7 @@ CREATE TABLE answers (
     choice4_selected tinyint(1) NOT NULL DEFAULT 0,
     essay_answer text DEFAULT NULL,
     comment text DEFAULT NULL,
+    graded tinyint(1) NOT NULL DEFAULT 0
     FOREIGN KEY (user_id) REFERENCES accounts(user_id) ON DELETE CASCADE,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE CASCADE
@@ -59,6 +60,3 @@ CREATE TABLE quiz_graded (
     FOREIGN KEY (user_id) REFERENCES accounts(user_id) ON DELETE CASCADE,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
-
- onclick="confirmButtonPressed(event, 'Are you sure you want to approve all questions in the quiz?')"
- onclick="confirmButtonPressed(event, 'are you sure you want to REVOKE the approved quiz?')"
