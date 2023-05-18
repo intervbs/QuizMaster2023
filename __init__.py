@@ -17,7 +17,7 @@ app.secret_key = secrets.token_urlsafe(16)
 #Error handling redirecting every error to index
 @app.errorhandler(Exception)
 def page_not_found(error):
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @login_manager.user_loader
 def load_user(user_id):
