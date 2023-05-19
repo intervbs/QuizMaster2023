@@ -131,7 +131,3 @@ class Select_user(FlaskForm):
             if user.username not in unique_users:
                 self.user.choices.append((user.user_id, user.username))
                 unique_users.add(user.username)
-
-class button(FlaskForm):
-    command = HiddenField()
-    button = SubmitField()

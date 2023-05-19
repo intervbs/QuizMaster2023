@@ -194,17 +194,6 @@ class myDB:
             print(error)
         return result
 
-    '''def get_all_quizzes(self, user_id):
-        try:
-            self.cursor.execute(SELECT DISTINCT q.quiz_id, q.name, q.description, q.category, q.is_public
-                                    FROM quizzes q
-                                    INNER JOIN answers a ON q.quiz_id = a.quiz_id
-                                    WHERE a.user_id = %s, (user_id,))
-            result = self.cursor.fetchall()
-        except mysql.connector.Error as error:
-            print(error)
-        return result'''
-
     #################
     #   QUESTIONS   #
     #################
@@ -266,12 +255,6 @@ class myDB:
                                 (quiz_id, question_text ,answer_1, answer_2, answer_3, answer_4, correct_answer_1, correct_answer_2, correct_answer_3, correct_answer_4, q_type))
         except mysql.connector.Error as error:
             print(error)
-
-    '''def quiz_answer(self, user_id, question_id, answer):
-        try:
-            self.cursor.execute('INSERT INTO answers (user_id, question_id, answer_text) VALUES (%s, %s, %s)', (user_id, question_id, answer))
-        except mysql.connector.Error as error:
-            print(error)'''
 
     def approve_question(self, question_id):
         try:
