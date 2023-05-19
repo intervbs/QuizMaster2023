@@ -29,7 +29,7 @@ class quiz_questions:
         self.is_correct4    = choice4_correct
         self.essay          = essay
         self.appoved        = approved
-        self.q_type       = q_type
+        self.q_type         = q_type
 
 class answered_question:
     def __init__(self, question_text, q_type, aid, choice1_selected, choice2_selected, choice3_selected, choice4_selected,

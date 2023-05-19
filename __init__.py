@@ -221,9 +221,7 @@ def questions():
             form.c_answer4.data = False
             return render_template('questions.html', form_question=form_question, form=form)
         else:
-            with myDB() as db:
-                graded = db.get_is_graded(current_user.id, quiz_id)
-            return render_template('questions.html', id=current_user.id, qid=quiz_id, graded=graded[0][0])
+            return render_template('questions.html', id=current_user.id, qid=quiz_id)
 
     elif q_id != None:
         # when entering the page it will find the first question if there is any

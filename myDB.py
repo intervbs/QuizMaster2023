@@ -160,9 +160,9 @@ class myDB:
             result = self.cursor.fetchall()
             if len(result) < 1:
                 self.inser_quiz_graded_empty(args[0], args[1])
-                self.UPDATE_quiz_comment_graded(args[2], args[3], result[0][0])
+                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
             else:
-                self.UPDATE_quiz_comment_graded(args[2], args[3], result[0][0])
+                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
         except mysql.connector.Error as error:
             print(error)
 
@@ -174,7 +174,7 @@ class myDB:
             print(error)
         return result
 
-    def UPDATE_quiz_comment_graded(self, comment, graded, graded_id):
+    def update_quiz_comment_graded(self, comment, graded, graded_id):
         try:
             self.cursor.execute('UPDATE quiz_graded SET comment = %s, graded = %s WHERE graded_id = %s', (comment, graded, graded_id,))
         except mysql.connector.Error as error:
@@ -262,7 +262,7 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
 
-    def UPDATE_question(self, test):
+    def update_question(self, test):
         try:
             sql = '''UPDATE questions SET 
                         question_text = (%s), 
@@ -370,13 +370,13 @@ class myDB:
     #   COMMENT   #
     ###############
 
-    def UPDATE_comment(self, aid, comment, graded):
+    def update_comment(self, aid, comment, graded):
         try:
             self.cursor.execute('UPDATE answers SET comment = %s, graded = %s WHERE answer_id = %s', (comment, graded, aid,))
         except mysql.connector.Error as error:
             print(error)
 
-    def UPDATE_quiz_graded(self, graded_id, graded):
+    def update_quiz_graded(self, graded_id, graded):
         try:
             self.cursor.execute('UPDATE quiz_graded SET graded = %s WHERE graded_id = %s', (graded, graded_id,))
         except mysql.connector.Error as error:
