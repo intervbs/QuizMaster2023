@@ -80,14 +80,14 @@ class myDB:
     
     def add_admin(self, userid, is_admin):
         try:
-            self.cursor.execute('update accounts set admin = %s where user_id = %s', (is_admin, userid,))
+            self.cursor.execute('UPDATE accounts SET admin = %s WHERE user_id = %s', (is_admin, userid,))
         except mysql.connector.Error as error:
             print(error)
         
     
     def check_user(self, username):
         try:
-            self.cursor.execute('select * from accounts where username = %s', (username,))
+            self.cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -95,7 +95,7 @@ class myDB:
     
     def check_email(self, email):
         try:
-            self.cursor.execute('select * from accounts where email = %s', (email,))
+            self.cursor.execute('SELECT * FROM accounts WHERE email = %s', (email,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -107,7 +107,7 @@ class myDB:
 
     def get_quiz_num(self, id):
         try:
-            self.cursor.execute('select * from quizzes where quiz_id = %s', (id,))
+            self.cursor.execute('SELECT * FROM quizzes WHERE quiz_id = %s', (id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -115,7 +115,7 @@ class myDB:
 
     def get_quiz_index(self):
         try:
-            self.cursor.execute('select * from quizzes')
+            self.cursor.execute('SELECT * FROM quizzes')
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -130,15 +130,15 @@ class myDB:
     def quiz_hide_show(self, quiz_id, value):
         try:
             if helper.check_if_quiz_is_approved(quiz_id):
-                self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
+                self.cursor.execute('UPDATE quizzes SET is_public = (%s) WHERE quiz_id = %s', (value, quiz_id,))
             if value == '0':
-                self.cursor.execute('update quizzes set is_public = (%s) where quiz_id = %s', (value, quiz_id,))
+                self.cursor.execute('UPDATE quizzes SET is_public = (%s) WHERE quiz_id = %s', (value, quiz_id,))
         except mysql.connector.Error as error:
             print(error)
 
     def get_is_graded(self, user_id, quiz_id):
         try:
-            self.cursor.execute('SELECT graded FROM quiz_graded WHERE user_id = %s and quiz_id = %s', (user_id, quiz_id,))
+            self.cursor.execute('SELECT graded FROM quiz_graded WHERE user_id = %s AND quiz_id = %s', (user_id, quiz_id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -148,7 +148,7 @@ class myDB:
         try:
             self.cursor.execute('INSERT INTO quiz_graded (user_id, quiz_id) VALUES (%s, %s)', (user_id, quiz_id,))
             self.conn.commit()
-            self.cursor.execute('select last_INSERT_id() as graded_id')
+            self.cursor.execute('SELECT last_INSERT_id() as graded_id')
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -156,39 +156,39 @@ class myDB:
 
     def add_quiz_comment_graded(self, *args):
         try:
-            self.cursor.execute('select graded_id from quiz_graded where user_id = %s and quiz_id = %s', (args[0], args[1],))
+            self.cursor.execute('SELECT graded_id FROM quiz_graded WHERE user_id = %s AND quiz_id = %s', (args[0], args[1],))
             result = self.cursor.fetchall()
             if len(result) < 1:
                 self.inser_quiz_graded_empty(args[0], args[1])
-                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
+                self.UPDATE_quiz_comment_graded(args[2], args[3], result[0][0])
             else:
-                self.update_quiz_comment_graded(args[2], args[3], result[0][0])
+                self.UPDATE_quiz_comment_graded(args[2], args[3], result[0][0])
         except mysql.connector.Error as error:
             print(error)
 
     def get_quiz_comment_graded(self, user_id, quiz_id):
         try:
-            self.cursor.execute('select * from quiz_graded where user_id = (%s) and quiz_id = (%s)', (user_id, quiz_id,))
+            self.cursor.execute('SELECT * FROM quiz_graded WHERE user_id = (%s) AND quiz_id = (%s)', (user_id, quiz_id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
         return result
 
-    def update_quiz_comment_graded(self, comment, graded, graded_id):
+    def UPDATE_quiz_comment_graded(self, comment, graded, graded_id):
         try:
-            self.cursor.execute('update quiz_graded set comment = %s, graded = %s where graded_id = %s', (comment, graded, graded_id,))
+            self.cursor.execute('UPDATE quiz_graded SET comment = %s, graded = %s WHERE graded_id = %s', (comment, graded, graded_id,))
         except mysql.connector.Error as error:
             print(error)
     
     def open_close_quiz(self, quiz_id, is_open):
         try:
-            self.cursor.execute('update quizzes set is_open = (%s) where quiz_id = (%s)', (is_open, quiz_id,))
+            self.cursor.execute('UPDATE quizzes SET is_open = (%s) WHERE quiz_id = (%s)', (is_open, quiz_id,))
         except mysql.connector.Error as error:
             print(error)
 
     def quiz_is_open(self, qid):
         try:
-            self.cursor.execute('select is_open from quizzes where quiz_id = %s', (qid,))
+            self.cursor.execute('SELECT is_open FROM quizzes WHERE quiz_id = %s', (qid,))
             result = self.cursor.fetchone()
         except mysql.connector.Error as error:
             print(error)
@@ -262,7 +262,7 @@ class myDB:
         except mysql.connector.Error as error:
             print(error)
 
-    def update_question(self, test):
+    def UPDATE_question(self, test):
         try:
             sql = '''UPDATE questions SET 
                         question_text = (%s), 
@@ -296,7 +296,7 @@ class myDB:
             self.add_answer(VALUES)
             self.cursor.execute('SELECT LAST_INSERT_ID() AS answer_id')
             result = self.cursor.fetchall()
-            self.update_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}', graded)
+            self.UPDATE_comment(result[0][0], f'USER DID NOT COMPLETE THE QUIZ AND THE ANSWER IS NOT ANSWERED\n\n{comment}', graded)
         except mysql.connector.Error as error:
             print(error)
 
@@ -360,7 +360,7 @@ class myDB:
     
     def check_answer_is_graded(self, user_id, quiz_id):
         try:
-            self.cursor.execute('SELECT graded FROM answers where user_id = %s and quiz_id = %s', (user_id, quiz_id,))
+            self.cursor.execute('SELECT graded FROM answers WHERE user_id = %s AND quiz_id = %s', (user_id, quiz_id,))
             result = self.cursor.fetchall()
         except mysql.connector.Error as error:
             print(error)
@@ -370,15 +370,15 @@ class myDB:
     #   COMMENT   #
     ###############
 
-    def update_comment(self, aid, comment, graded):
+    def UPDATE_comment(self, aid, comment, graded):
         try:
             self.cursor.execute('UPDATE answers SET comment = %s, graded = %s WHERE answer_id = %s', (comment, graded, aid,))
         except mysql.connector.Error as error:
             print(error)
 
-    def update_quiz_graded(self, graded_id, graded):
+    def UPDATE_quiz_graded(self, graded_id, graded):
         try:
-            self.cursor.execute('UPDATE quiz_graded SET graded = %s where graded_id = %s', (graded, graded_id,))
+            self.cursor.execute('UPDATE quiz_graded SET graded = %s WHERE graded_id = %s', (graded, graded_id,))
         except mysql.connector.Error as error:
             print(error)
 
