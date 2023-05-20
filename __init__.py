@@ -433,18 +433,9 @@ def update():
             form.correct_answer_4.data = 1
 
         # Validates the form and update the question
-        question_id     = form.question_id.data
-        question_text   = form.question_text.data.strip
-        answer_1        = form.answer_1.data
-        answer_2        = form.answer_2.data
-        answer_3        = form.answer_3.data
-        answer_4        = form.answer_4.data
-        correct_answer_1 = form.correct_answer_1.data
-        correct_answer_2 = form.correct_answer_2.data
-        correct_answer_3 = form.correct_answer_3.data
-        correct_answer_4 = form.correct_answer_4.data
-        values = (question_text, answer_1, answer_2, answer_3, answer_4, 
-                  correct_answer_1, correct_answer_2, correct_answer_3,  correct_answer_4, question_id, 0)
+        values = (form.question_text.data, form.answer_1.data, form.answer_2.data, form.answer_3.data, form.answer_4.data, 
+                  form.correct_answer_1.data, form.correct_answer_2.data, form.correct_answer_3.data, form.correct_answer_4.data,
+                  0, form.question_id.data)
         with myDB() as db:
             db.update_question(values)
         return redirect(url_for('edit_quiz'))
