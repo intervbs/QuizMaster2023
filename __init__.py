@@ -146,7 +146,7 @@ def approve():
                     return redirect(url_for('approve', id=form_question.quiz_id.data))
                 else:
                     db.approve_question(form_question.question_id.data)
-                #return redirect(url_for('approve', id=form_question.quiz_id.data))
+
         # when entering the page it will find the first question if there is any
         with myDB() as db:
             result = db.get_question_not_approved(quiz_id)
